@@ -7,7 +7,7 @@ function TetrisField (props) {
     var rows = [];
     props.field.forEach(function (row)
       {
-        const cols = row.map ((c)=><td key={field.id} className={' FancyBorder tdcol-'+c}> </td>);
+        const cols = row.map ((c,index)=><td key={index} className={' FancyBorder tdcol-'+c}> </td>);
         rows.push(<tr >{cols}</tr>);
       });
        return (
