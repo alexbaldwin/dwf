@@ -2,6 +2,12 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
+import logo from '../public/images/dwf-logo.svg'
+
+import Draggable from 'react-draggable';
+
+const Tetris = require('react-tetris');
+
 export default function Home() {
   return (
     <div className={styles.container}>
@@ -11,59 +17,109 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Tetris
+      keyboardControls={{
+        // Default values shown here. These will be used if no
+        // `keyboardControls` prop is provided.
+        down: 'MOVE_DOWN',
+        left: 'MOVE_LEFT',
+        right: 'MOVE_RIGHT',
+        space: 'HARD_DROP',
+        z: 'FLIP_COUNTERCLOCKWISE',
+        x: 'FLIP_CLOCKWISE',
+        up: 'FLIP_CLOCKWISE',
+        p: 'TOGGLE_PAUSE',
+        c: 'HOLD',
+        shift: 'HOLD'
+      }}
+    >
+      {({
+        HeldPiece,
+        Gameboard,
+        PieceQueue,
+        points,
+        linesCleared,
+        state,
+        controller
+      }) => (
+        <div>
+          <HeldPiece />
+          <div>
+            <p>Points: {points}</p>
+            <p>Lines Cleared: {linesCleared}</p>
+          </div>
+          <Gameboard />
+          <PieceQueue />
+          {state === 'LOST' && (
+            <div>
+              <h2>Game Over</h2>
+              <button onClick={controller.restart}>New game</button>
+            </div>
+          )}
+        </div>
+      )}
+    </Tetris>
+
       <main className={styles.main}>
-        <h1 className={styles.title}>
-		Dinner with Friends
+        <h1 className="hide">
+          Dinner with Friends
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <Image
+        src={logo}
+        className="logo"
+        alt="Dinner with Friends"
+      />
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+        <Draggable
+        handle=".handle"
+        defaultPosition={{x: 0, y: 50}}
+        position={null}
+        grid={[25, 25]}
+        scale={1}>
+          <div className={styles.card}>
+            <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
+            <div>Insert good stuff here please</div>
+          </div>
+        </Draggable>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+        <Draggable
+        handle=".handle"
+        defaultPosition={{x: -100, y: 400}}
+        position={null}
+        grid={[25, 25]}
+        scale={1}>
+          <div className={styles.card}>
+            <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
+            <div>Insert good stuff here please</div>
+          </div>
+        </Draggable>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+        <Draggable
+        handle=".handle"
+        defaultPosition={{x: 100, y: -500}}
+        position={null}
+        grid={[25, 25]}
+        scale={1}>
+          <div className={styles.card}>
+            <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
+            <div>Insert good stuff here please</div>
+          </div>
+        </Draggable>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <Draggable
+        handle=".handle"
+        defaultPosition={{x: -300, y: 0}}
+        position={null}
+        grid={[25, 25]}
+        scale={1}>
+          <div className={styles.card}>
+            <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
+            <div>Insert good stuff here please</div>
+          </div>
+        </Draggable>
+
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+    </div >
   )
 }

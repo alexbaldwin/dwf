@@ -14,3 +14,30 @@ a {
 * {
   box-sizing: border-box;
 }
+
+:root {
+  --brand-primary: hsla(0, 0%, 30%, 1);
+  --brand-secondary: hsla(0, 0%, 30%, 0.2);
+  --brand-bg: hsla(65, 100%, 53%, 1);
+}
+
+body {
+  background-color: var(--brand-bg);
+  background-image:
+    repeating-linear-gradient(var(--brand-secondary), var(--brand-secondary) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0.25turn, var(--brand-secondary), var(--brand-primary) 1px, transparent 1px, transparent 80px);
+  color: var(--brand-primary);
+}
+
+
+.react-draggable {
+  border: 1px solid var(--brand-primary);
+  background-color: var(--brand-bg);
+}
+
+.logo {}
+
+.hide {
+  opacity: 0;
+  display: none;
+}
