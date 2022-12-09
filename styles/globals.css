@@ -18,6 +18,7 @@ a {
 :root {
   --brand-primary: hsla(0, 0%, 30%, 1);
   --brand-secondary: hsla(0, 0%, 30%, 0.2);
+  --brand-tertiary: hsla(0, 0%, 88%, 1);
   --brand-bg: hsla(65, 100%, 53%, 1);
 }
 
@@ -40,4 +41,54 @@ body {
 .hide {
   opacity: 0;
   display: none;
+}
+
+
+// Tetris
+.AlignCenter {
+  margin:0px auto; 
+  padding:0;
+  border: 10px solid;
+  border-color: #888888;
+  text-align:center;
+  display: none;
+}
+.ButtonAlignCenter {
+  margin:0px auto; 
+  padding:0;
+  border: 1px solid;
+  border-color: #444444;
+  text-align:center;
+  background-color:black;
+  display: none;
+}
+.PlayField {
+    position: relative;
+    display: inline-block;
+    width: 20%; height: 100%;
+}
+.WhiteText {
+  color: white;
+  background-color:black;
+  display: none;
+}
+.FancyBorder {
+  padding: 10px 10px;
+  /* border: 1px solid;
+  border-color: #aaaaaa; */
+}
+.tdcol-0{
+    background: #E1E1E1;
+    mix-blend-mode: multiply;
+}
+
+.tdcol-1,
+.tdcol-2,
+.tdcol-3,
+.tdcol-4,
+.tdcol-5,
+.tdcol-6,
+.tdcol-7 {
+    background-color: var(--brand-primary); 
+    opacity: 0.5;
 }
