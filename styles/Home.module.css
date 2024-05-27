@@ -12,6 +12,26 @@
   align-items: center;
 }
 
+.nav {
+  display: flex;
+  flex:  1;
+  background: hsla(0, 0%, 92%, 1);
+  position: fixed;
+  border: 1px solid hsla(0, 0%, 30%, 1);
+  border: 1px solid hsla(0, 0%, 30%, 1);
+  right: 0;
+  left: 0;
+  top: 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.nav div {
+  display: inline;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .footer {
   display: flex;
   flex: 1;
@@ -95,6 +115,10 @@
   margin: 0;
   font-size: 1.25rem;
   line-height: 1.5;
+}
+
+.card img {
+  max-width: 100%;
 }
 
 .logo {

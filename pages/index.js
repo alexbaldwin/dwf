@@ -1,3 +1,5 @@
+"use client"
+
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
@@ -9,11 +11,17 @@ import Draggable from 'react-draggable';
 import dynamic from 'next/dynamic'
 //import Tetris from '../components/tetris';
 
+
 const Tetris = dynamic(() => import("../components/tetris"), {
   ssr: false,
   });
 
 export default function Home() {
+  let date = new Date();
+  setInterval(() => {
+    date = new Date();
+  }, 1000);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -22,7 +30,20 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+
       <main className={styles.main}>
+        <nav className={styles.nav}>
+        <div>Dinner with Friends</div>
+        <div>Work</div>
+        <div>About</div>
+        <div>Knowledge</div>
+        <div>Contact</div>
+        <div className="grow"></div>
+        <div>{date.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+        <div>{date.toLocaleString('en-US', { hour:   '2-digit', minute: '2-digit' })}</div>
+        <div>Light • Dark</div>
+        </nav>
+
         <h1 className="hide">
           Dinner with Friends
         </h1>
@@ -48,13 +69,14 @@ export default function Home() {
 
         <Draggable
         handle=".handle"
-        defaultPosition={{x: -100, y: 400}}
+        defaultPosition={{x: -100, y: 0}}
         position={null}
         grid={[25, 25]}
         scale={1}>
           <div className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
-            <div>Insert good stuff here please</div>
+            <div>Justin Graham</div>
+            <img src="/images/justin.jpg" />
           </div>
         </Draggable>
 
@@ -66,7 +88,8 @@ export default function Home() {
         scale={1}>
           <div className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
-            <div>Insert good stuff here please</div>
+            <div>Alex Baldwin</div>
+            <img src="/images/alex.jpg" />
           </div>
         </Draggable>
 
