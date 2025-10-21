@@ -2,6 +2,7 @@
 
 import Head from 'next/head'
 import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 import styles from '../styles/Home.module.css'
 
 import logo from '../public/images/dwf-logo.svg'
@@ -17,10 +18,19 @@ const Tetris = dynamic(() => import("../components/tetris"), {
   });
 
 export default function Home() {
-  let date = new Date();
-  setInterval(() => {
-    date = new Date();
-  }, 1000);
+  const [date, setDate] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDate(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const tetrisCardRef = useRef(null);
+  const justinCardRef = useRef(null);
+  const alexCardRef = useRef(null);
+  const noteCardRef = useRef(null);
 
   return (
     <div className={styles.container}>
@@ -59,8 +69,9 @@ export default function Home() {
         defaultPosition={{x: 0, y: 50}}
         position={null}
         grid={[25, 25]}
-        scale={1}>
-          <div className={styles.card}>
+        scale={1}
+        nodeRef={tetrisCardRef}>
+          <div ref={tetrisCardRef} className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
             <div>TETRIS</div>
             <Tetris></Tetris>
@@ -72,11 +83,18 @@ export default function Home() {
         defaultPosition={{x: -100, y: 0}}
         position={null}
         grid={[25, 25]}
-        scale={1}>
-          <div className={styles.card}>
+        scale={1}
+        nodeRef={justinCardRef}>
+          <div ref={justinCardRef} className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
             <div>Justin Graham</div>
-            <img src="/images/justin.jpg" />
+            <Image
+              src="/images/justin.jpg"
+              alt="Portrait of Justin Graham"
+              width={500}
+              height={500}
+              priority
+            />
           </div>
         </Draggable>
 
@@ -85,11 +103,18 @@ export default function Home() {
         defaultPosition={{x: 100, y: -500}}
         position={null}
         grid={[25, 25]}
-        scale={1}>
-          <div className={styles.card}>
+        scale={1}
+        nodeRef={alexCardRef}>
+          <div ref={alexCardRef} className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
             <div>Alex Baldwin</div>
-            <img src="/images/alex.jpg" />
+            <Image
+              src="/images/alex.jpg"
+              alt="Portrait of Alex Baldwin"
+              width={500}
+              height={500}
+              priority
+            />
           </div>
         </Draggable>
 
@@ -98,8 +123,9 @@ export default function Home() {
         defaultPosition={{x: -300, y: 0}}
         position={null}
         grid={[25, 25]}
-        scale={1}>
-          <div className={styles.card}>
+        scale={1}
+        nodeRef={noteCardRef}>
+          <div ref={noteCardRef} className={styles.card}>
             <div className="handle">▓▓▓▓▓▓▓▓▓▓▓▓▓▓</div>
             <div>Insert good stuff here please</div>
           </div>

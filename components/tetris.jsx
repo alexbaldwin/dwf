@@ -1,237 +1,694 @@
-// Source from https://codepen.io/hendrikhoffmann/pen/oBQVeP
+import { useCallback, useEffect, useMemo, useState } from "react";
+import styles from "../styles/Tetris.module.css";
 
-import React from "react";
-import ReactDOM from "react-dom";
-
-function TetrisField (props) {
-    var rows = [];
-    props.field.forEach(function (row)
-      {
-        const cols = row.map ((c,index)=><td key={index} className={' FancyBorder tdcol-'+c}> </td>);
-        rows.push(<tr >{cols}</tr>);
-      });
-       return (
-         <div className={' AlignCenter'}>
-           <h3 className={' WhiteText PlayField'}> Level:{props.level} Score:{props.score}  {props.gameOver && '  Game Over  '}</h3>
-           <table><tr>{rows}</tr></table>
-           {props.children}
-         </div>);
-     }
-
-class Tetris extends React.Component{
-constructor(props){
-  super (props);
-  this.handleLeftClick = this.handleLeftClick.bind(this);
-  this.handleRightClick = this.handleRightClick.bind(this);
-  this.handleFlipClick = this.handleFlipClick.bind(this);
-  this.handleDownClick = this.handleDownClick.bind(this);
-  this.handleNewGameClick = this.handleNewGameClick.bind(this);
-  this.handlePauseClick = this.handlePauseClick.bind(this);
-  var field=[];
-  for (var y = 0; y < props.ySize; y++){
-    var row = [];
-    for (var x = 0; x < props.xSize; x++){
-      row.push(0);
-    }
-    field.push(row);
-  }
-  var xStart=Math.floor(parseInt(props.xSize)/2);
-  this.state = {
-    activeTileX: xStart,
-    activeTileY: 1, activeTile: 1 , tileTurn: 0,
-    score: 0, level: 1, tileCount : 0,
-    gameOver: false, pause: false,
-    field : field,
-    tiles : [ // 7 tiles each tile has 4 possible turnstates which are x/y offsets
-            [[[0,0],[0,0],[0,0],[0,0]],[[0,0],[0,0],[0,0],[0,0]],[[0,0],[0,0],[0,0],[0,0]],[[0,0],[0,0],[0,0],[0,0]]], // 1 single square (not part of the game)
-            [[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[0,1],[1,1]]], // the 4-block
-            [[[0,-1],[0,0],[0,1],[0,2]],[[-1,0],[0,0],[1,0],[2,0]],[[0,-1],[0,0],[0,1],[0,2]],[[-1,0],[0,0],[1,0],[2,0]]], // the long one
-            [[[0,0],[-1,0],[1,0],[0,-1]],[[0,0],[1,0],[0,1],[0,-1]],[[0,0],[-1,0],[1,0],[0,1]],[[0,0],[-1,0],[0,1],[0,-1]]], // the T
-            [[[0,0],[-1,0],[1,0],[-1,-1]],[[0,0],[0,1],[0,-1],[1,-1]],[[0,0],[1,0],[-1,0],[1,1]],[[0,0],[0,1],[0,-1],[-1,1]]], // the inverse L
-            [[[0,0],[1,0],[-1,0],[1,-1]],[[0,0],[0,1],[0,-1],[1,1]],[[0,0],[1,0],[-1,0],[-1,1]],[[0,0],[0,1],[0,-1],[-1,-1]]], // the L
-            [[[0,0],[1,0],[0,-1],[-1,-1]],[[0,0],[1,0],[0,1],[1,-1]],[[0,0],[1,0],[0,-1],[-1,-1]],[[0,0],[1,0],[0,1],[1,-1]]], // the Z
-            [[[0,0],[-1,0],[0,-1],[1,-1]],[[0,0],[0,-1],[1,0],[1,1]],[[0,0],[-1,0],[0,-1],[1,-1]],[[0,0],[0,-1],[1,0],[1,1]]] // the inverse Z
-            ]
+const ROWS = 20;
+const COLS = 10;
+const SPAWN_POSITION = { x: Math.floor(COLS / 2) - 2, y: -1 };
+const LINE_CLEAR_POINTS = [0, 40, 100, 300, 1200];
+const CELL_COLORS = {
+  I: "#5ED3F3",
+  O: "#F2C94C",
+  T: "#BB6BD9",
+  S: "#6FCF97",
+  Z: "#EB5757",
+  J: "#2D9CDB",
+  L: "#F2994A",
 };
-}
- componentDidMount() {
-     var timerId;
-    timerId = setInterval (()=> this.updateField('down'),1000-(this.state.level*10 > 600 ? 600 : this.state.level*10));
-    this.setState({timerId: timerId});
-}
-componentWillUnmount(){
-  clearInterval(this.state.timerId);
-}
-updateField (command) {
-  if (this.state.gameOver || this.state.pause) {return;}
-  var xAdd = 0;
-  var yAdd = 0;
-  var turnAdd = 0;
-  var tile = this.state.activeTile;
-  
-  if (command =='left' ){xAdd =-1;}
-  if (command =='right' ){xAdd =1;}
-  if (command =='turn' ){turnAdd =1;}
-  if (command =='down' ){yAdd =1;}
 
-  var field =  this.state.field;
-  var x = this.state.activeTileX;
-  var y = this.state.activeTileY;
-  var turn = this.state.tileTurn;
-  const tiles = this.state.tiles;
+const SHAPES = {
+  I: [
+    [
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [2, 0],
+    ],
+    [
+      [1, -1],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+    ],
+    [
+      [-1, 1],
+      [0, 1],
+      [1, 1],
+      [2, 1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [0, 1],
+      [0, 2],
+    ],
+  ],
+  O: [
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ],
+  ],
+  T: [
+    [
+      [0, 0],
+      [-1, 0],
+      [1, 0],
+      [0, 1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [0, 1],
+      [1, 0],
+    ],
+    [
+      [0, 0],
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [0, 1],
+      [-1, 0],
+    ],
+  ],
+  S: [
+    [
+      [0, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [1, 0],
+      [1, 1],
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [1, 0],
+      [1, 1],
+    ],
+  ],
+  Z: [
+    [
+      [-1, 0],
+      [0, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [1, -1],
+      [0, 0],
+      [1, 0],
+      [0, 1],
+    ],
+    [
+      [-1, 0],
+      [0, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [1, -1],
+      [0, 0],
+      [1, 0],
+      [0, 1],
+    ],
+  ],
+  J: [
+    [
+      [-1, 0],
+      [-1, 1],
+      [0, 0],
+      [1, 0],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [0, 1],
+      [1, 1],
+    ],
+    [
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [1, -1],
+    ],
+    [
+      [-1, -1],
+      [0, -1],
+      [0, 0],
+      [0, 1],
+    ],
+  ],
+  L: [
+    [
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [1, 1],
+    ],
+    [
+      [0, -1],
+      [0, 0],
+      [0, 1],
+      [1, -1],
+    ],
+    [
+      [-1, -1],
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+    ],
+    [
+      [-1, 1],
+      [0, -1],
+      [0, 0],
+      [0, 1],
+    ],
+  ],
+};
 
-  // remove actual tile from field to test for new insert position
-  field[y+tiles[tile][turn][0][1]][x+tiles[tile][turn][0][0]] = 0;
-  field[y+tiles[tile][turn][1][1]][x+tiles[tile][turn][1][0]] = 0;
-  field[y+tiles[tile][turn][2][1]][x+tiles[tile][turn][2][0]] = 0;
-  field[y+tiles[tile][turn][3][1]][x+tiles[tile][turn][3][0]] = 0;
-  
-  // test if the move can be executed on actual field
-  var xAddValid = true;
-  if (xAdd != 0){
-  for (var  i = 0; i <=3 ; i++){
-    if (x+xAdd+tiles[tile][turn][i][0] >=0 && x+xAdd+tiles[tile][turn][i][0] < this.props.xSize) {
-      if (field[y+tiles[tile][turn][i][1]][x+xAdd+tiles[tile][turn][i][0]] != 0) {
-      xAddValid = false;  
-      }
-    } else {
-      xAddValid = false;
-    }
-  }}
-  if (xAddValid) { x += xAdd;}
-   //try the Turn
-  var newTurn = turn+turnAdd>3 ? 0 : turn+turnAdd;
-  var turnValid = true;
-  if (turnAdd != 0){
-  for (var  i = 0; i <=3 ; i++){
-    if (x+tiles[tile][newTurn][i][0] >=0 && x+tiles[tile][newTurn][i][0] < this.props.xSize &&
-        y+tiles[tile][newTurn][i][1] >=0 && y+tiles[tile][newTurn][i][1] < this.props.ySize
-       ) {
-      if (field[y+tiles[tile][newTurn][i][1]][x+tiles[tile][newTurn][i][0]] != 0) {
-      turnValid = false;  
-      }
-    } else {
-      turnValid = false;
-    }
-  }}
-   if (turnValid) { turn = newTurn;}
-  // try the y-Add. 
-  var yAddValid = true;
-  if (yAdd != 0){
-  for (var  i = 0; i <=3 ; i++){
-    if (y+yAdd+tiles[tile][turn][i][1] >=0 && y+yAdd+tiles[tile][turn][i][1] < this.props.ySize) {
-      if (field[y+yAdd+tiles[tile][turn][i][1]][x+tiles[tile][turn][i][0]] != 0) {
-      yAddValid = false;  
-      }
-    } else {
-      yAddValid = false;
-    }
-  }}
-  if (yAddValid) { y += yAdd;} 
-  // render the tile at new position
-  field[y+tiles[tile][turn][0][1]][x+tiles[tile][turn][0][0]] = tile;
-  field[y+tiles[tile][turn][1][1]][x+tiles[tile][turn][1][0]] = tile;
-  field[y+tiles[tile][turn][2][1]][x+tiles[tile][turn][2][0]] = tile;
-  field[y+tiles[tile][turn][3][1]][x+tiles[tile][turn][3][0]] = tile;
+const SHAPE_KEYS = Object.keys(SHAPES);
 
-  if (!yAddValid) { 
-    // Moving Down was not possible -> remove completed Lines, add Score. find nextr tile and check for Game Over ...
-    for (var yr = this.props.ySize-1; yr >=0; yr--){
-      var lineComplete = true;
-      for (var x = 0; x < this.props.xSize; x++){
-        if (field[yr][x]==0){lineComplete = false;}
+function createEmptyBoard() {
+  return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+}
+
+function randomShape() {
+  return SHAPE_KEYS[Math.floor(Math.random() * SHAPE_KEYS.length)];
+}
+
+function createPiece(shape) {
+  return {
+    shape,
+    rotation: 0,
+    position: { ...SPAWN_POSITION },
+  };
+}
+
+function getBlocks(piece, rotationOverride, positionOverride) {
+  const rotation = rotationOverride ?? piece.rotation;
+  const position = positionOverride ?? piece.position;
+  const offsets = SHAPES[piece.shape][rotation];
+  return offsets.map(([x, y]) => [position.x + x, position.y + y]);
+}
+
+function canPlace(board, piece, position = piece.position, rotation = piece.rotation) {
+  const blocks = getBlocks(piece, rotation, position);
+  return blocks.every(([x, y]) => {
+    if (x < 0 || x >= COLS || y >= ROWS) return false;
+    if (y < 0) return true;
+    return !board[y][x];
+  });
+}
+
+function mergePiece(board, piece) {
+  const next = board.map((row) => row.slice());
+  for (const [x, y] of getBlocks(piece)) {
+    if (y < 0) {
+      return null;
+    }
+    next[y][x] = piece.shape;
+  }
+  return next;
+}
+
+function clearLines(board) {
+  let cleared = 0;
+  const remaining = [];
+  for (const row of board) {
+    if (row.every(Boolean)) {
+      cleared += 1;
+    } else {
+      remaining.push(row);
+    }
+  }
+  while (remaining.length < ROWS) {
+    remaining.unshift(Array(COLS).fill(null));
+  }
+  return { board: remaining, cleared };
+}
+
+function getSpeed(level) {
+  return Math.max(900 - (level - 1) * 80, 120);
+}
+
+function useInterval(callback, delay) {
+  useEffect(() => {
+    if (delay === null) return undefined;
+    const id = setInterval(() => {
+      callback();
+    }, delay);
+    return () => clearInterval(id);
+  }, [callback, delay]);
+}
+
+function getGhostPiece(board, piece) {
+  if (!piece) return null;
+  let offset = 0;
+  while (
+    canPlace(board, piece, {
+      x: piece.position.x,
+      y: piece.position.y + offset + 1,
+    })
+  ) {
+    offset += 1;
+  }
+  if (offset === 0) return piece;
+  return {
+    ...piece,
+    position: {
+      x: piece.position.x,
+      y: piece.position.y + offset,
+    },
+  };
+}
+
+function getCellPresentation(value) {
+  if (!value) {
+    return {
+      color: "rgba(255, 255, 255, 0.06)",
+      variant: "empty",
+    };
+  }
+  const [shape, variant = "static"] = value.split("-");
+  const color = CELL_COLORS[shape] ?? "#888";
+  return { color, variant };
+}
+
+function NextPreview({ shape }) {
+  const previewGrid = useMemo(() => {
+    const grid = Array.from({ length: 4 }, () => Array(4).fill(null));
+    if (!shape) return grid;
+    const offsets = SHAPES[shape][0];
+    const minX = Math.min(...offsets.map(([x]) => x));
+    const minY = Math.min(...offsets.map(([, y]) => y));
+    offsets.forEach(([x, y]) => {
+      const px = x - minX;
+      const py = y - minY;
+      if (py >= 0 && py < 4 && px >= 0 && px < 4) {
+        grid[py][px] = shape;
       }
-      if (lineComplete){
-        for (var ySrc=yr; yr >0 ; yr--){
-          for (var x = 0; x < this.props.xSize; x++){
-            field[yr][x] = field[yr-1][x];
-          }
+    });
+    return grid;
+  }, [shape]);
+
+  return (
+    <div className={styles.nextGrid}>
+      {previewGrid.map((row, rowIndex) =>
+        row.map((cell, colIndex) => {
+          const key = `${rowIndex}-${colIndex}`;
+          const { color, variant } = getCellPresentation(cell);
+          return (
+            <div
+              key={key}
+              className={styles.nextCell}
+              style={{
+                backgroundColor: variant === "empty" ? "transparent" : color,
+                borderColor:
+                  variant === "empty" ? "rgba(255, 255, 255, 0.12)" : color,
+              }}
+            />
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+export default function Tetris() {
+  const [board, setBoard] = useState(() => createEmptyBoard());
+  const [activePiece, setActivePiece] = useState(null);
+  const [nextShape, setNextShape] = useState(() => randomShape());
+  const [isRunning, setIsRunning] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [lines, setLines] = useState(0);
+
+  const startNewGame = useCallback(() => {
+    const freshBoard = createEmptyBoard();
+    const initialShape = randomShape();
+    const initialPiece = createPiece(initialShape);
+    setBoard(freshBoard);
+    setActivePiece(initialPiece);
+    setNextShape(randomShape());
+    setScore(0);
+    setLevel(1);
+    setLines(0);
+    setIsGameOver(false);
+    setIsRunning(true);
+  }, []);
+
+  const endGame = useCallback(() => {
+    setIsGameOver(true);
+    setIsRunning(false);
+    setActivePiece(null);
+  }, []);
+
+  const commitPiece = useCallback(
+    (pieceToLock) => {
+      const merged = mergePiece(board, pieceToLock);
+      if (!merged) {
+        endGame();
+        return;
+      }
+      const { board: clearedBoard, cleared } = clearLines(merged);
+      const totalLines = lines + cleared;
+      const nextLevel = Math.min(20, 1 + Math.floor(totalLines / 10));
+      const levelForScore = Math.max(level, nextLevel);
+      if (cleared > 0) {
+        setScore((prev) => prev + LINE_CLEAR_POINTS[cleared] * levelForScore);
+      }
+      setBoard(clearedBoard);
+      setLines(totalLines);
+      setLevel(nextLevel);
+      const upcomingShape = nextShape;
+      const newActive = createPiece(upcomingShape);
+      const followingShape = randomShape();
+      setNextShape(followingShape);
+      if (!canPlace(clearedBoard, newActive)) {
+        endGame();
+        return;
+      }
+      setActivePiece(newActive);
+    },
+    [board, endGame, level, lines, nextShape]
+  );
+
+  const moveHorizontal = useCallback(
+    (direction) => {
+      if (!isRunning) return;
+      setActivePiece((prev) => {
+        if (!prev) return prev;
+        const nextPosition = {
+          x: prev.position.x + direction,
+          y: prev.position.y,
+        };
+        if (canPlace(board, prev, nextPosition)) {
+          return { ...prev, position: nextPosition };
         }
-        yr = this.props.ySize; // check the array again after line removal
+        return prev;
+      });
+    },
+    [board, isRunning]
+  );
+
+  const rotatePiece = useCallback(() => {
+    if (!isRunning) return;
+    setActivePiece((prev) => {
+      if (!prev) return prev;
+      const nextRotation = (prev.rotation + 1) % SHAPES[prev.shape].length;
+      const kicks = [0, -1, 1, -2, 2];
+      for (const offset of kicks) {
+        const candidatePosition = {
+          x: prev.position.x + offset,
+          y: prev.position.y,
+        };
+        if (canPlace(board, prev, candidatePosition, nextRotation)) {
+          return { ...prev, rotation: nextRotation, position: candidatePosition };
+        }
+      }
+      return prev;
+    });
+  }, [board, isRunning]);
+
+  const softDrop = useCallback(() => {
+    if (!isRunning) return;
+    setActivePiece((prev) => {
+      if (!prev) return prev;
+      const nextPosition = {
+        x: prev.position.x,
+        y: prev.position.y + 1,
+      };
+      if (canPlace(board, prev, nextPosition)) {
+        return { ...prev, position: nextPosition };
+      }
+      commitPiece(prev);
+      return prev;
+    });
+  }, [board, commitPiece, isRunning]);
+
+  const hardDrop = useCallback(() => {
+    if (!isRunning || !activePiece) return;
+    let dropDistance = 0;
+    while (
+      canPlace(board, activePiece, {
+        x: activePiece.position.x,
+        y: activePiece.position.y + dropDistance + 1,
+      })
+    ) {
+      dropDistance += 1;
+    }
+    const landed = {
+      ...activePiece,
+      position: {
+        x: activePiece.position.x,
+        y: activePiece.position.y + dropDistance,
+      },
+    };
+    commitPiece(landed);
+  }, [activePiece, board, commitPiece, isRunning]);
+
+  const togglePause = useCallback(() => {
+    if (isGameOver || !activePiece) return;
+    setIsRunning((prev) => !prev);
+  }, [activePiece, isGameOver]);
+
+  const dropDelay = isRunning && !isGameOver ? getSpeed(level) : null;
+  useInterval(softDrop, dropDelay);
+
+  const ghostPiece = useMemo(
+    () => (activePiece ? getGhostPiece(board, activePiece) : null),
+    [activePiece, board]
+  );
+
+  const displayBoard = useMemo(() => {
+    const draft = board.map((row) => row.slice());
+    if (ghostPiece && activePiece) {
+      for (const [x, y] of getBlocks(ghostPiece)) {
+        if (y >= 0 && !draft[y][x]) {
+          draft[y][x] = `${ghostPiece.shape}-ghost`;
+        }
       }
     }
-    this.setState(prev => ({score: prev.score+ 1*prev.level,
-                            tileCount: prev.tileCount +1,
-                            level: 1+Math.floor(prev.tileCount/10)}));
-    var timerId;
-    clearInterval(this.state.timerId);
-    timerId = setInterval (()=> this.updateField('down'),1000-(this.state.level*10 > 600 ? 600 : this.state.level*10));
-    this.setState({timerId: timerId});
-    // New Tile:
-    tile = Math.floor((Math.random() * 7) + 1);
-    x = parseInt(this.props.xSize)/2; y = 1; turn =0;
-    // Test for Game Over, can the new tile placed in field?
-    if (
-        field[y+tiles[tile][turn][0][1]][x+tiles[tile][turn][0][0]] != 0 ||
-        field[y+tiles[tile][turn][1][1]][x+tiles[tile][turn][1][0]] != 0 ||
-        field[y+tiles[tile][turn][2][1]][x+tiles[tile][turn][2][0]] != 0 ||
-        field[y+tiles[tile][turn][3][1]][x+tiles[tile][turn][3][0]] != 0 
-      ) {
-       this.setState({gameOver: true});
-    } else {
-      // Render New Tile and go on
-      field[y+tiles[tile][turn][0][1]][x+tiles[tile][turn][0][0]] = tile;
-      field[y+tiles[tile][turn][1][1]][x+tiles[tile][turn][1][0]] = tile;
-      field[y+tiles[tile][turn][2][1]][x+tiles[tile][turn][2][0]] = tile;
-      field[y+tiles[tile][turn][3][1]][x+tiles[tile][turn][3][0]] = tile;
+    if (activePiece) {
+      for (const [x, y] of getBlocks(activePiece)) {
+        if (y >= 0) {
+          draft[y][x] = `${activePiece.shape}-active`;
+        }
+      }
     }
-  }
-  this.setState((prev)=>({field: field, activeTileX: x, activeTileY: y, tileTurn: turn, activeTile: tile }));
-}
-handleLeftClick()
-{
-  this.updateField('left');
-} 
-handleRightClick(){
-  this.updateField('right');
-}
-handleFlipClick (){
-  this.updateField('turn');
-}
-handleDownClick (){
-this.updateField('down');
-}
-handlePauseClick()
-{
-this.setState((prev)=> ({pause: !prev.pause}));    
-}
-handleNewGameClick (){
-    var field=[];
-  for (var y = 0; y < this.props.ySize; y++){
-    var row = [];
-    for (var x = 0; x < this.props.xSize; x++){
-      row.push(0);
-    }
-    field.push(row);
-  }
-   var xStart=Math.floor(parseInt(this.props.xSize)/2);
-   this.setState((prev)=>(
-    {activeTileX: xStart,
-    activeTileY: 1, activeTile: 2 ,  tileTurn: 0,
-    score: 0, level: 1, tileCount : 0,
-    gameOver: false, field: field }));
-}
-  render () {
-    return (
-      <div> <table> <tr> <td> </td> <td>
-        <TetrisField field={this.state.field} gameOver={this.state.gameOver} score = {this.state.score} level = {this.state.level} turn={this.state.tileTurn}/>
-        </td> </tr> <tr> <td> </td>
-        <td className={'ButtonAlignCenter'}>
-          <button onClick={this.handleLeftClick} >Left</button>
-          <button onClick={this.handleFlipClick} >Flip</button>
-          <button onClick={this.handleRightClick}>Right</button>
-        </td> </tr> <tr> <td> </td>
-        <td className={'ButtonAlignCenter'}><button onClick={this.handleDownClick} >Down</button></td>
-        <td> </td> </tr> <tr> <td> </td> <td>
-        <button onClick={this.handleNewGameClick} >New Game</button>
-        <button onClick={this.handlePauseClick} >Pause</button>
-        </td><td></td></tr>
-        </table>
-      </div>
-    );
-  }
-}
+    return draft;
+  }, [activePiece, board, ghostPiece]);
 
-export default function RenderTetris() {
-    return (<Tetris xSize='10' ySize='14'/>);
-  }
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.defaultPrevented) return;
+      switch (event.key) {
+        case "ArrowLeft":
+          event.preventDefault();
+          moveHorizontal(-1);
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          moveHorizontal(1);
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          rotatePiece();
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          softDrop();
+          break;
+        case " ":
+          event.preventDefault();
+          hardDrop();
+          break;
+        case "p":
+        case "P":
+          event.preventDefault();
+          togglePause();
+          break;
+        case "n":
+        case "N":
+          event.preventDefault();
+          startNewGame();
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [hardDrop, moveHorizontal, rotatePiece, softDrop, startNewGame, togglePause]);
+
+  useEffect(() => {
+    if (!activePiece && !isGameOver) {
+      const initialPiece = createPiece(randomShape());
+      if (!canPlace(board, initialPiece)) {
+        endGame();
+      } else {
+        setActivePiece(initialPiece);
+      }
+    }
+  }, [activePiece, board, endGame, isGameOver]);
+
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>Tetris</h3>
+        <div className={styles.levelBadge}>Lv {level}</div>
+      </div>
+      <div className={styles.topRow}>
+        <div className={styles.board} role="grid" aria-label="Tetris board">
+          {displayBoard.map((row, rowIndex) =>
+            row.map((cell, colIndex) => {
+              const key = `${rowIndex}-${colIndex}`;
+              const { color, variant } = getCellPresentation(cell);
+              const style = {
+                backgroundColor:
+                  variant === "ghost"
+                    ? "transparent"
+                    : variant === "empty"
+                    ? "rgba(255, 255, 255, 0.06)"
+                    : color,
+                borderColor:
+                  variant === "ghost"
+                    ? `${color}66`
+                    : variant === "empty"
+                    ? "rgba(255, 255, 255, 0.12)"
+                    : `${color}88`,
+                boxShadow:
+                  variant === "ghost"
+                    ? `0 0 0 1px ${color}55 inset`
+                    : "none",
+              };
+              return (
+                <div
+                  key={key}
+                  className={styles.cell}
+                  style={style}
+                  role="gridcell"
+                />
+              );
+            })
+          )}
+        </div>
+        <aside className={styles.sidebar}>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Score</span>
+            <span className={styles.statValue}>{score}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Lines</span>
+            <span className={styles.statValue}>{lines}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Next</span>
+            <NextPreview shape={nextShape} />
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Speed</span>
+            <span className={styles.statValue}>
+              {dropDelay ? `${Math.round(dropDelay)}ms` : "—"}
+            </span>
+          </div>
+        </aside>
+      </div>
+      <div className={styles.statusRow}>
+        {isGameOver ? (
+          <span className={styles.statusBadge}>Game Over</span>
+        ) : !isRunning ? (
+          <span className={styles.statusBadge}>Paused</span>
+        ) : (
+          <span className={styles.statusBadgeActive}>Running</span>
+        )}
+      </div>
+      <div className={styles.controls}>
+        <button className={styles.button} onClick={startNewGame}>
+          {isGameOver ? "Play Again" : "New Game"}
+        </button>
+        <button
+          className={styles.button}
+          onClick={togglePause}
+          disabled={isGameOver || !activePiece}
+        >
+          {isRunning ? "Pause" : "Resume"}
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => moveHorizontal(-1)}
+          disabled={!isRunning}
+        >
+          ←
+        </button>
+        <button
+          className={styles.button}
+          onClick={rotatePiece}
+          disabled={!isRunning}
+        >
+          ⟳
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => moveHorizontal(1)}
+          disabled={!isRunning}
+        >
+          →
+        </button>
+        <button
+          className={styles.button}
+          onClick={softDrop}
+          disabled={!isRunning}
+        >
+          Soft Drop
+        </button>
+        <button
+          className={styles.buttonAccent}
+          onClick={hardDrop}
+          disabled={!isRunning}
+        >
+          Hard Drop
+        </button>
+      </div>
+      <p className={styles.hint}>
+        Shortcuts: ← → move, ↑ rotate, ↓ soft drop, space hard drop, P pause, N
+        new game.
+      </p>
+    </div>
+  );
+}
