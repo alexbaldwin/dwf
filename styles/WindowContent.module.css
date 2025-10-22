@@ -1,0 +1,80 @@
+.display {
+  background: var(--bg-secondary);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--text-secondary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.input {
+  background: var(--bg-secondary);
+  border: none;
+  padding: 12px;
+  font-family: 'PP NeueBit', sans-serif;
+  font-size: 20px;
+  color: var(--text-secondary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.textarea {
+  background: var(--bg-secondary);
+  border: none;
+  padding: 12px;
+  font-family: 'PP NeueBit', sans-serif;
+  font-size: 20px;
+  color: var(--text-secondary);
+  resize: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.button {
+  background: var(--bg-window);
+  border: 1px solid var(--border-primary);
+  padding: 8px 24px;
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.buttonYellow {
+  background: var(--accent-yellow);
+  border: 1px solid var(--border-primary);
+  padding: 8px 24px;
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: #4d4d4d;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.placeholder {
+  background: var(--bg-secondary);
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.imageFrame {
+  border: 1px solid var(--border-primary);
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+  position: relative;
+}

@@ -1,134 +1,146 @@
 .container {
-  padding: 0 2rem;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-primary);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  position: relative;
+  overflow: hidden;
+  padding-top: 36px;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
 .nav {
   display: flex;
-  flex:  1;
-  background: hsla(0, 0%, 92%, 1);
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
   position: fixed;
-  border: 1px solid hsla(0, 0%, 30%, 1);
-  border: 1px solid hsla(0, 0%, 30%, 1);
   right: 0;
   left: 0;
   top: 0;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  z-index: 1000;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.nav div {
-  display: inline;
-  padding-left: 1rem;
-  padding-right: 1rem;
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  color: var(--text-secondary);
+}
+
+.navBrand {
+  font-family: 'PP Editorial New', serif;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: -0.325px;
+}
+
+.navItem {
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.navItem.inactive {
+  opacity: 0.4;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navTime {
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--text-secondary);
+  white-space: pre;
+}
+
+.navTheme {
+  display: flex;
+  gap: 8px;
+  font-family: 'PP NeueBit', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+
+.navTheme span {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.navTheme span.inactive {
+  opacity: 0.4;
+}
+
+.hero {
+  position: absolute;
+  left: 50%;
+  top: 432px;
+  transform: translateX(-50%);
+  width: 1324px;
+  font-family: 'PP Editorial New', serif;
+  font-weight: normal;
+  font-size: 128px;
+  line-height: 132px;
+  letter-spacing: -4.48px;
+  color: var(--text-primary);
+  text-align: center;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.hero p {
+  margin: 0;
 }
 
 .footer {
-  display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
-  align-items: center;
-}
-
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-}
-
-.title a {
-  color: #0070f3;
-  text-decoration: none;
-}
-
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
-}
-
-.title {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-}
-
-.title,
-.description {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: 1146px;
+  max-width: 90vw;
+  font-family: 'PP NeueBit', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.2px;
+  color: var(--text-primary);
   text-align: center;
+  line-height: 18px;
+  z-index: 50;
+  transition: color 0.3s ease;
 }
 
-.description {
-  margin: 4rem 0;
-  line-height: 1.5;
-  font-size: 1.5rem;
-}
-
-.code {
-  background: #fafafa;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-    Bitstream Vera Sans Mono, Courier New, monospace;
-}
-
-.grid {
+.desktopIcons {
+  position: fixed;
+  right: 80px;
+  top: 70px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
-}
-
-.card {
-  padding: 0.75rem;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 300px;
-}
-
-.card:hover,
-.card:focus,
-.card:active {
-  color: #0070f3;
-  border-color: #0070f3;
-}
-
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-}
-
-.card p {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
-}
-
-.card img {
-  max-width: 100%;
-}
-
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
-}
-
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
+  flex-direction: column;
+  gap: 16px;
+  z-index: 10;
 }
