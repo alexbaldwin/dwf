@@ -7,13 +7,13 @@ const COLS = 10;
 const SPAWN_POSITION = { x: Math.floor(COLS / 2) - 2, y: -1 };
 const LINE_CLEAR_POINTS = [0, 40, 100, 300, 1200];
 const CELL_COLORS = {
-  I: "#5ED3F3",
-  O: "#F2C94C",
-  T: "#BB6BD9",
-  S: "#6FCF97",
-  Z: "#EB5757",
-  J: "#2D9CDB",
-  L: "#F2994A",
+  I: "#4d4d4d",
+  O: "#4d4d4d",
+  T: "#4d4d4d",
+  S: "#4d4d4d",
+  Z: "#4d4d4d",
+  J: "#4d4d4d",
+  L: "#4d4d4d",
 };
 
 const SHAPES = {
@@ -548,15 +548,9 @@ export default function Tetris() {
                   }`}
                   style={{
                     backgroundColor:
-                      variant === "ghost"
+                      variant === "ghost" || variant === "empty"
                         ? "transparent"
-                        : variant === "empty"
-                        ? "rgba(255, 255, 255, 0.08)"
                         : color,
-                    borderColor:
-                      variant === "ghost"
-                        ? `${color}55`
-                        : "rgba(255, 255, 255, 0.18)",
                   }}
                   role="gridcell"
                 />
@@ -568,7 +562,7 @@ export default function Tetris() {
       <div className={styles.actions}>
         <button
           type="button"
-          className={`${contentStyles.buttonYellow} ${styles.actionButton}`}
+          className={`${contentStyles.button} ${styles.actionButton}`}
           onClick={startNewGame}
         >
           {isGameOver ? "Play Again" : "New Game"}
