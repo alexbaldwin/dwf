@@ -9,11 +9,11 @@ This is a Next.js 15 application featuring an interactive draggable workspace wi
 ## Development Commands
 
 ### Essential Commands
-- `npm install` - Install dependencies (use npm to keep package-lock.json authoritative)
-- `npm run dev` - Start development server on http://localhost:3000 with live reloading
-- `npm run build` - Generate optimized production bundle
-- `npm run start` - Serve production build locally for smoke testing
-- `npm run lint` - Run ESLint with Next.js preset; treat warnings as blockers
+- `pnpm install` - Install dependencies (pnpm is the mandated package manager via `packageManager`)
+- `pnpm dev` - Start development server on http://localhost:3000 with live reloading
+- `pnpm build` - Generate optimized production bundle
+- `pnpm start` - Serve production build locally for smoke testing
+- `pnpm lint` - Run ESLint flat config; treat warnings as blockers
 
 ## Architecture
 
