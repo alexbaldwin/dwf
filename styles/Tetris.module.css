@@ -1,55 +1,30 @@
-.wrapper {
+.container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(230, 233, 247, 0.92));
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
-  min-width: 340px;
+  gap: 12px;
+  width: 100%;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1e293b;
-}
-
-.levelBadge {
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(59, 130, 246, 0.14);
-  color: #1d4ed8;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.topRow {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
+.frame {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  overflow: hidden;
+  border-radius: 4px;
 }
 
 .board {
+  position: absolute;
+  inset: 12px;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(20, 1fr);
   gap: 2px;
-  background: radial-gradient(circle at top, #0f172a, #0b1120 65%);
-  border-radius: 12px;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95));
   padding: 8px;
-  width: 240px;
-  aspect-ratio: 10 / 20;
+  border-radius: 10px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
@@ -57,124 +32,22 @@
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.08);
-  transition: transform 90ms ease, background 90ms ease;
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
-.sidebar {
+.cellGhost {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: transparent !important;
+}
+
+.actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 160px;
+  justify-content: flex-end;
 }
 
-.statCard {
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.statLabel {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #475569;
-  font-weight: 600;
-}
-
-.statValue {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.nextGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  padding: 6px;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.08);
-  border: 1px dashed rgba(15, 23, 42, 0.12);
-}
-
-.nextCell {
-  aspect-ratio: 1 / 1;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: transparent;
-}
-
-.statusRow {
-  display: flex;
-  justify-content: center;
-}
-
-.statusBadge,
-.statusBadgeActive {
-  padding: 6px 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  border-radius: 999px;
-}
-
-.statusBadge {
-  background: rgba(148, 163, 184, 0.2);
-  color: #475569;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-}
-
-.statusBadgeActive {
-  background: rgba(34, 197, 94, 0.18);
-  color: #047857;
-  border: 1px solid rgba(34, 197, 94, 0.35);
-}
-
-.controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 10px;
-}
-
-.button,
-.buttonAccent {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
-  background: rgba(15, 23, 42, 0.08);
-  color: #1f2937;
-}
-
-.button:disabled,
-.buttonAccent:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.button:hover:not(:disabled),
-.buttonAccent:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.14);
-}
-
-.buttonAccent {
-  background: linear-gradient(140deg, #2563eb, #4f46e5);
-  color: white;
-}
-
-.hint {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #64748b;
-  text-align: center;
-  letter-spacing: 0.03em;
+.actionButton {
+  width: auto;
+  font-size: 20px;
+  padding: 8px 24px;
 }

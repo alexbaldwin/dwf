@@ -206,12 +206,9 @@ export default function Home() {
           position={windowPositions.tetris}
           onPositionChange={(pos) => updateWindowPosition('tetris', pos)}
         >
-          <div>
-            <Window title="Tetris" onMinimize={() => minimizeWindow('tetris')}>
-              <div className={contentStyles.placeholder} style={{ height: '340px', width: '216px' }} />
-              <button className={contentStyles.button}>
-                Play
-              </button>
+          <div style={{ width: '360px' }}>
+            <Window title="Tetris" onMinimize={() => minimizeWindow('tetris')} width="281px">
+              <Tetris />
             </Window>
           </div>
         </AnimatedWindow>

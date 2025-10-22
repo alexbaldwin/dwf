@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import contentStyles from "../styles/WindowContent.module.css";
 import styles from "../styles/Tetris.module.css";
 
 const ROWS = 20;
@@ -308,46 +309,6 @@ function getCellPresentation(value) {
   return { color, variant };
 }
 
-function NextPreview({ shape }) {
-  const previewGrid = useMemo(() => {
-    const grid = Array.from({ length: 4 }, () => Array(4).fill(null));
-    if (!shape) return grid;
-    const offsets = SHAPES[shape][0];
-    const minX = Math.min(...offsets.map(([x]) => x));
-    const minY = Math.min(...offsets.map(([, y]) => y));
-    offsets.forEach(([x, y]) => {
-      const px = x - minX;
-      const py = y - minY;
-      if (py >= 0 && py < 4 && px >= 0 && px < 4) {
-        grid[py][px] = shape;
-      }
-    });
-    return grid;
-  }, [shape]);
-
-  return (
-    <div className={styles.nextGrid}>
-      {previewGrid.map((row, rowIndex) =>
-        row.map((cell, colIndex) => {
-          const key = `${rowIndex}-${colIndex}`;
-          const { color, variant } = getCellPresentation(cell);
-          return (
-            <div
-              key={key}
-              className={styles.nextCell}
-              style={{
-                backgroundColor: variant === "empty" ? "transparent" : color,
-                borderColor:
-                  variant === "empty" ? "rgba(255, 255, 255, 0.12)" : color,
-              }}
-            />
-          );
-        })
-      )}
-    </div>
-  );
-}
-
 export default function Tetris() {
   const [board, setBoard] = useState(() => createEmptyBoard());
   const [activePiece, setActivePiece] = useState(null);
@@ -495,6 +456,10 @@ export default function Tetris() {
     [activePiece, board]
   );
 
+  useEffect(() => {
+    startNewGame();
+  }, [startNewGame]);
+
   const displayBoard = useMemo(() => {
     const draft = board.map((row) => row.slice());
     if (ghostPiece && activePiece) {
@@ -568,127 +533,47 @@ export default function Tetris() {
   }, [activePiece, board, endGame, isGameOver]);
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>Tetris</h3>
-        <div className={styles.levelBadge}>Lv {level}</div>
-      </div>
-      <div className={styles.topRow}>
+    <div className={styles.container}>
+      <div className={styles.frame}>
         <div className={styles.board} role="grid" aria-label="Tetris board">
           {displayBoard.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
               const key = `${rowIndex}-${colIndex}`;
               const { color, variant } = getCellPresentation(cell);
-              const style = {
-                backgroundColor:
-                  variant === "ghost"
-                    ? "transparent"
-                    : variant === "empty"
-                    ? "rgba(255, 255, 255, 0.06)"
-                    : color,
-                borderColor:
-                  variant === "ghost"
-                    ? `${color}66`
-                    : variant === "empty"
-                    ? "rgba(255, 255, 255, 0.12)"
-                    : `${color}88`,
-                boxShadow:
-                  variant === "ghost"
-                    ? `0 0 0 1px ${color}55 inset`
-                    : "none",
-              };
               return (
                 <div
                   key={key}
-                  className={styles.cell}
-                  style={style}
+                  className={`${styles.cell} ${
+                    variant === "ghost" ? styles.cellGhost : ""
+                  }`}
+                  style={{
+                    backgroundColor:
+                      variant === "ghost"
+                        ? "transparent"
+                        : variant === "empty"
+                        ? "rgba(255, 255, 255, 0.08)"
+                        : color,
+                    borderColor:
+                      variant === "ghost"
+                        ? `${color}55`
+                        : "rgba(255, 255, 255, 0.18)",
+                  }}
                   role="gridcell"
                 />
               );
             })
           )}
         </div>
-        <aside className={styles.sidebar}>
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>Score</span>
-            <span className={styles.statValue}>{score}</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>Lines</span>
-            <span className={styles.statValue}>{lines}</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>Next</span>
-            <NextPreview shape={nextShape} />
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>Speed</span>
-            <span className={styles.statValue}>
-              {dropDelay ? `${Math.round(dropDelay)}ms` : "—"}
-            </span>
-          </div>
-        </aside>
       </div>
-      <div className={styles.statusRow}>
-        {isGameOver ? (
-          <span className={styles.statusBadge}>Game Over</span>
-        ) : !isRunning ? (
-          <span className={styles.statusBadge}>Paused</span>
-        ) : (
-          <span className={styles.statusBadgeActive}>Running</span>
-        )}
-      </div>
-      <div className={styles.controls}>
-        <button className={styles.button} onClick={startNewGame}>
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={`${contentStyles.buttonYellow} ${styles.actionButton}`}
+          onClick={startNewGame}
+        >
           {isGameOver ? "Play Again" : "New Game"}
         </button>
-        <button
-          className={styles.button}
-          onClick={togglePause}
-          disabled={isGameOver || !activePiece}
-        >
-          {isRunning ? "Pause" : "Resume"}
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => moveHorizontal(-1)}
-          disabled={!isRunning}
-        >
-          ←
-        </button>
-        <button
-          className={styles.button}
-          onClick={rotatePiece}
-          disabled={!isRunning}
-        >
-          ⟳
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => moveHorizontal(1)}
-          disabled={!isRunning}
-        >
-          →
-        </button>
-        <button
-          className={styles.button}
-          onClick={softDrop}
-          disabled={!isRunning}
-        >
-          Soft Drop
-        </button>
-        <button
-          className={styles.buttonAccent}
-          onClick={hardDrop}
-          disabled={!isRunning}
-        >
-          Hard Drop
-        </button>
       </div>
-      <p className={styles.hint}>
-        Shortcuts: ← → move, ↑ rotate, ↓ soft drop, space hard drop, P pause, N
-        new game.
-      </p>
     </div>
   );
 }
