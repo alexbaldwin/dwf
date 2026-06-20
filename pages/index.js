@@ -1,21 +1,47 @@
-"use client"
-
 import Head from 'next/head'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 import styles from '../styles/Home.module.css'
 import contentStyles from '../styles/WindowContent.module.css'
-import dynamic from 'next/dynamic'
 import Window from '../components/Window'
 import DesktopIcon from '../components/DesktopIcon'
 
-const Tetris = dynamic(() => import("../components/tetris"), {
-  ssr: false,
-})
+const Tetris = dynamic(() => import('../components/tetris'), { ssr: false })
 
 const AnimatedWindow = dynamic(() => import('../components/AnimatedWindow'), {
-  ssr: false,
+  ssr: false
 })
+
+function getInitialWindowPositions(viewportWidth = 1440) {
+  if (viewportWidth < 760) {
+    return {
+      calculator: { x: 16, y: 58 },
+      images: { x: 16, y: 178 },
+      email: { x: 16, y: 430 },
+      tetris: { x: 16, y: 720 },
+      music: { x: 16, y: 1110 }
+    }
+  }
+
+  if (viewportWidth < 1180) {
+    return {
+      calculator: { x: 24, y: 58 },
+      images: { x: 48, y: 470 },
+      email: { x: viewportWidth - 330, y: 76 },
+      tetris: { x: viewportWidth - 410, y: 320 },
+      music: { x: viewportWidth - 310, y: 710 }
+    }
+  }
+
+  return {
+    calculator: { x: 24, y: 54 },
+    images: { x: 70, y: 550 },
+    email: { x: 950, y: 77 },
+    tetris: { x: 1160, y: 212 },
+    music: { x: 1152, y: 739 }
+  }
+}
 
 export default function Home() {
   const [date, setDate] = useState(() => new Date())
@@ -27,13 +53,9 @@ export default function Home() {
     tetris: 'visible',
     music: 'visible'
   })
-  const [windowPositions, setWindowPositions] = useState({
-    calculator: { x: 24, y: 54 },
-    images: { x: 70, y: 550 },
-    email: { x: 950, y: 77 },
-    tetris: { x: 1160, y: 212 },
-    music: { x: 1152, y: 739 }
-  })
+  const [windowPositions, setWindowPositions] = useState(() =>
+    getInitialWindowPositions(typeof window === 'undefined' ? undefined : window.innerWidth)
+  )
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -44,6 +66,7 @@ export default function Home() {
 
   useEffect(() => {
     document.body.setAttribute('data-theme', theme)
+    return () => document.body.removeAttribute('data-theme')
   }, [theme])
 
   const toggleTheme = (selectedTheme) => {
@@ -109,18 +132,22 @@ export default function Home() {
             {date.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </div>
           <div className={styles.navTheme}>
-            <span
+            <button
+              type="button"
               className={theme === 'dark' ? styles.inactive : ''}
               onClick={() => toggleTheme('light')}
+              aria-pressed={theme === 'light'}
             >
               Light
-            </span>
-            <span
+            </button>
+            <button
+              type="button"
               className={theme === 'light' ? styles.inactive : ''}
               onClick={() => toggleTheme('dark')}
+              aria-pressed={theme === 'dark'}
             >
               Dark
-            </span>
+            </button>
           </div>
         </div>
       </nav>
@@ -149,8 +176,12 @@ export default function Home() {
           position={windowPositions.calculator}
           onPositionChange={(pos) => updateWindowPosition('calculator', pos)}
         >
-          <div style={{ width: '200px' }}>
-            <Window title="Calculator" width="200px" onMinimize={() => minimizeWindow('calculator')}>
+          <div className={styles.calculatorShell}>
+            <Window
+              title="Calculator"
+              width="min(200px, calc(100vw - 32px))"
+              onMinimize={() => minimizeWindow('calculator')}
+            >
               <div className={contentStyles.display}>
                 $$$
               </div>
@@ -164,16 +195,20 @@ export default function Home() {
           position={windowPositions.images}
           onPositionChange={(pos) => updateWindowPosition('images', pos)}
         >
-          <div style={{ width: '281px' }}>
-            <Window title="Images" width="281px" onMinimize={() => minimizeWindow('images')}>
-              <div className={contentStyles.imageFrame} style={{ height: '200px', width: '257px' }}>
+          <div className={styles.imagesShell}>
+            <Window
+              title="Images"
+              width="min(281px, calc(100vw - 32px))"
+              onMinimize={() => minimizeWindow('images')}
+            >
+              <div className={contentStyles.imageFrame}>
                 <Image
                   src="/images/alex.jpg"
                   alt="Portrait of Alex Baldwin"
                   fill
-                  sizes="257px"
+                  loading="eager"
+                  sizes="(max-width: 760px) calc(100vw - 56px), 257px"
                   style={{ objectFit: 'cover', opacity: 0.6 }}
-                  priority
                 />
               </div>
             </Window>
@@ -186,14 +221,34 @@ export default function Home() {
           position={windowPositions.email}
           onPositionChange={(pos) => updateWindowPosition('email', pos)}
         >
-          <div style={{ width: '250px' }}>
-            <Window title="Email" backgroundColor="var(--accent-yellow)" width="250px" onMinimize={() => minimizeWindow('email')}>
+          <div className={styles.emailShell}>
+            <Window
+              title="Email"
+              backgroundColor="var(--accent-yellow)"
+              width="min(250px, calc(100vw - 32px))"
+              onMinimize={() => minimizeWindow('email')}
+            >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <input type="text" placeholder="Name" className={contentStyles.input} />
-                <input type="email" placeholder="Email" className={contentStyles.input} />
-                <textarea placeholder="Message" rows="7" className={contentStyles.textarea} />
+                <input
+                  type="text"
+                  placeholder="Name"
+                  aria-label="Name"
+                  className={contentStyles.input}
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  aria-label="Email"
+                  className={contentStyles.input}
+                />
+                <textarea
+                  placeholder="Message"
+                  aria-label="Message"
+                  rows="7"
+                  className={contentStyles.textarea}
+                />
               </div>
-              <button className={contentStyles.buttonYellow}>
+              <button type="button" className={contentStyles.buttonYellow}>
                 Send
               </button>
             </Window>
@@ -206,8 +261,12 @@ export default function Home() {
           position={windowPositions.tetris}
           onPositionChange={(pos) => updateWindowPosition('tetris', pos)}
         >
-          <div style={{ width: '360px' }}>
-            <Window title="Tetris" onMinimize={() => minimizeWindow('tetris')} width="281px">
+          <div className={styles.tetrisShell}>
+            <Window
+              title="Tetris"
+              onMinimize={() => minimizeWindow('tetris')}
+              width="min(360px, calc(100vw - 32px))"
+            >
               <Tetris />
             </Window>
           </div>
@@ -219,7 +278,7 @@ export default function Home() {
           position={windowPositions.music}
           onPositionChange={(pos) => updateWindowPosition('music', pos)}
         >
-          <div>
+          <div className={styles.musicShell}>
             <Window title="Music" onMinimize={() => minimizeWindow('music')}>
               <div className={contentStyles.placeholder} style={{ height: '44px', width: '200px' }} />
             </Window>

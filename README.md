@@ -5,7 +5,7 @@ This repo powers the interactive “Dinner with Friends” desktop experience bu
 ### Prerequisites
 
 - Node 20+
-- [pnpm](https://pnpm.io/) 8.x (project declares `packageManager: pnpm@8.15.5`)
+- [pnpm](https://pnpm.io/) 11.x (project declares `packageManager: pnpm@11.8.0`)
 
 Install once:
 
@@ -32,8 +32,11 @@ Key code entry points:
 
 ```bash
 pnpm lint   # ESLint flat config
+pnpm test   # Jest + Testing Library coverage for component logic
 pnpm build  # Production bundle check
-pnpm start  # Optional: serve the build locally
+pnpm test:browser # Playwright smoke checks against pnpm start
+pnpm perf   # Production performance check against pnpm start
+pnpm verify # Full local quality gate
 ```
 
 Deploy with your preferred platform (e.g., Vercel) by running the same `pnpm build` step in CI before publishing.

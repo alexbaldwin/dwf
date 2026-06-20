@@ -11,13 +11,20 @@ const Window = forwardRef(({ title, children, backgroundColor, width, onMinimize
         width: width || 'auto'
       }}
     >
-      <div
+      <button
+        type="button"
         className={`${styles.titleBar} handle`}
-        style={{ cursor: 'move' }}
         onDoubleClick={(e) => {
           e.stopPropagation()
           if (onMinimize) onMinimize()
         }}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && onMinimize) {
+            e.preventDefault()
+            onMinimize()
+          }
+        }}
+        aria-label={`Move or minimize ${title} window`}
       >
         <div className={styles.titleBarLines}>
           <div className={styles.line} />
@@ -29,10 +36,10 @@ const Window = forwardRef(({ title, children, backgroundColor, width, onMinimize
         <div className={styles.titleBarLines}>
           <div className={styles.line} />
           <div className={styles.line} />
-          <div className={styles.line} />
+            <div className={styles.line} />
           <div className={styles.line} />
         </div>
-      </div>
+      </button>
       <div className={styles.content}>
         {children}
       </div>

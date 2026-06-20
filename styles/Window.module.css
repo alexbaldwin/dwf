@@ -9,10 +9,20 @@
 }
 
 .titleBar {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
+  cursor: move;
+}
+
+.titleBar:focus-visible {
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 4px;
 }
 
 .titleBarLines {

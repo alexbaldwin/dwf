@@ -28,13 +28,17 @@ export default function AnimatedWindow({ isVisible, nodeRef, position, onPositio
       grid={[1, 1]}
       nodeRef={nodeRef}
       disabled={!isVisible}
+      bounds="parent"
     >
       <div
         ref={nodeRef}
+        aria-hidden={!isVisible}
+        inert={isVisible ? undefined : true}
         style={{
           position: 'absolute',
           zIndex: 500,
-          pointerEvents: isVisible ? 'auto' : 'none'
+          pointerEvents: isVisible ? 'auto' : 'none',
+          visibility: isVisible ? 'visible' : 'hidden'
         }}
       >
         <motion.div

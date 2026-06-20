@@ -1,14 +1,14 @@
 .container {
   padding: 0;
   margin: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
   overflow: hidden;
 }
 
 .main {
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
   background-color: var(--bg-primary);
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
@@ -51,7 +51,7 @@
   font-family: 'PP Editorial New', serif;
   font-weight: bold;
   font-size: 13px;
-  letter-spacing: -0.325px;
+  letter-spacing: 0;
 }
 
 .navItem {
@@ -88,12 +88,23 @@
   color: var(--text-secondary);
 }
 
-.navTheme span {
+.navTheme button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 0;
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
 
-.navTheme span.inactive {
+.navTheme button:focus-visible {
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 3px;
+}
+
+.navTheme button.inactive {
   opacity: 0.4;
 }
 
@@ -102,12 +113,12 @@
   left: 50%;
   top: 432px;
   transform: translateX(-50%);
-  width: 1324px;
+  width: min(1324px, 88vw);
   font-family: 'PP Editorial New', serif;
   font-weight: normal;
-  font-size: 128px;
-  line-height: 132px;
-  letter-spacing: -4.48px;
+  font-size: clamp(48px, 8vw, 128px);
+  line-height: 1.03;
+  letter-spacing: 0;
   color: var(--text-primary);
   text-align: center;
   pointer-events: none;
@@ -127,7 +138,7 @@
   max-width: 90vw;
   font-family: 'PP NeueBit', sans-serif;
   font-size: 20px;
-  letter-spacing: 0.2px;
+  letter-spacing: 0;
   color: var(--text-primary);
   text-align: center;
   line-height: 18px;
@@ -143,4 +154,69 @@
   flex-direction: column;
   gap: 16px;
   z-index: 10;
+}
+
+.calculatorShell,
+.imagesShell,
+.emailShell,
+.tetrisShell,
+.musicShell {
+  max-width: calc(100vw - 32px);
+}
+
+@media (max-width: 760px) {
+  .container {
+    overflow: visible;
+  }
+
+  .main {
+    min-height: 1280px;
+    overflow: visible;
+    padding-top: 82px;
+  }
+
+  .nav {
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .navLeft,
+  .navRight {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .navItem,
+  .navTime,
+  .navTheme {
+    font-size: 18px;
+  }
+
+  .hero {
+    top: 220px;
+    width: min(560px, 86vw);
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 16px;
+    width: min(520px, 86vw);
+  }
+
+  .desktopIcons {
+    right: 16px;
+    top: 100px;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  .hero {
+    top: 340px;
+  }
+
+  .desktopIcons {
+    right: 32px;
+  }
 }

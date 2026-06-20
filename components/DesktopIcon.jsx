@@ -2,7 +2,12 @@ import styles from '../styles/DesktopIcon.module.css'
 
 export default function DesktopIcon({ name, isYellow, onClick }) {
   return (
-    <div className={styles.desktopIcon} onClick={onClick}>
+    <button
+      type="button"
+      className={styles.desktopIcon}
+      onClick={onClick}
+      aria-label={`${name} window`}
+    >
       <div
         className={styles.iconContainer}
         style={{
@@ -18,6 +23,6 @@ export default function DesktopIcon({ name, isYellow, onClick }) {
         </div>
       </div>
       <p className={styles.label}>{name}</p>
-    </div>
+    </button>
   )
 }
