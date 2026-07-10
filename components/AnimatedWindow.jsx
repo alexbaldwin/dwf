@@ -1,10 +1,21 @@
 'use client'
 
 import { useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import Draggable from 'react-draggable'
 
-export default function AnimatedWindow({ isVisible, nodeRef, position, onPositionChange, children }) {
+export default function AnimatedWindow({
+  isVisible,
+  isDraggable,
+  nodeRef,
+  position,
+  onPositionChange,
+  onActivate,
+  zIndex,
+  className,
+  children
+}) {
+  const reduceMotion = useReducedMotion()
   const handleDrag = useCallback(
     (_event, data) => {
       onPositionChange({ x: data.x, y: data.y })
@@ -27,18 +38,20 @@ export default function AnimatedWindow({ isVisible, nodeRef, position, onPositio
       onStop={handleStop}
       grid={[1, 1]}
       nodeRef={nodeRef}
-      disabled={!isVisible}
+      disabled={!isVisible || !isDraggable}
       bounds="parent"
+      cancel="[data-no-drag], input, textarea, button, select, a"
     >
       <div
         ref={nodeRef}
+        className={className}
         aria-hidden={!isVisible}
         inert={isVisible ? undefined : true}
+        onPointerDown={onActivate}
         style={{
-          position: 'absolute',
-          zIndex: 500,
+          zIndex,
           pointerEvents: isVisible ? 'auto' : 'none',
-          visibility: isVisible ? 'visible' : 'hidden'
+          display: isVisible ? undefined : 'none'
         }}
       >
         <motion.div
@@ -47,7 +60,7 @@ export default function AnimatedWindow({ isVisible, nodeRef, position, onPositio
             scale: isVisible ? 1 : 0.94,
             opacity: isVisible ? 1 : 0
           }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: reduceMotion ? 0 : 0.16 }}
         >
           {children}
         </motion.div>

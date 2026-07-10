@@ -3,13 +3,13 @@ export const COLS = 10
 export const SPAWN_POSITION = { x: Math.floor(COLS / 2) - 2, y: -1 }
 export const LINE_CLEAR_POINTS = [0, 40, 100, 300, 1200]
 export const CELL_COLORS = {
-  I: '#4d4d4d',
-  O: '#4d4d4d',
-  T: '#4d4d4d',
-  S: '#4d4d4d',
-  Z: '#4d4d4d',
-  J: '#4d4d4d',
-  L: '#4d4d4d'
+  I: '#2d8f9d',
+  O: '#d8b51d',
+  T: '#8a61a8',
+  S: '#4d8d57',
+  Z: '#c8504e',
+  J: '#3f68a8',
+  L: '#d8782e'
 }
 
 export const SHAPES = {
@@ -437,8 +437,4 @@ export function gameReducer(state, action) {
     default:
       return state
   }
-}
-
-export function createGameReducer() {
-  return gameReducer
 }

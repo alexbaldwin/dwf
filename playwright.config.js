@@ -6,13 +6,13 @@ export default defineConfig({
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://127.0.0.1:3200',
     trace: 'on-first-retry'
   },
   webServer: {
-    command: 'corepack pnpm@11.8.0 start',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    command: 'corepack pnpm exec next start -p 3200',
+    url: 'http://127.0.0.1:3200',
+    reuseExistingServer: false,
     timeout: 120_000
   },
   projects: [

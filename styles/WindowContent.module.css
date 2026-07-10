@@ -1,90 +1,370 @@
-.display {
-  background: var(--bg-secondary);
-  height: 44px;
+.fieldLabel,
+.contactForm label > span {
+  color: var(--text-muted);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.calculator {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.moneyField {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  color: var(--text-secondary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 48px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--control-bg);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 28px;
 }
 
-.input {
-  background: var(--bg-secondary);
-  border: none;
-  padding: 12px;
-  font-family: 'PP NeueBit', sans-serif;
-  font-size: 20px;
-  color: var(--text-secondary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+.moneyField span {
+  padding-left: 10px;
 }
 
-.input:focus-visible,
-.textarea:focus-visible,
-.button:focus-visible,
-.buttonYellow:focus-visible {
-  outline: 2px solid var(--border-primary);
-  outline-offset: 2px;
+.moneyField input {
+  min-width: 0;
+  width: 100%;
+  padding: 8px 10px 8px 4px;
+  border: 0;
+  outline-offset: -2px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
-.input::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.7;
+.moneyField input::-webkit-inner-spin-button {
+  appearance: none;
 }
 
-.textarea {
-  background: var(--bg-secondary);
-  border: none;
-  padding: 12px;
-  font-family: 'PP NeueBit', sans-serif;
-  font-size: 20px;
-  color: var(--text-secondary);
-  resize: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
+.controlRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.textarea::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.7;
-}
-
-.button {
-  background: var(--bg-window);
+.stepper,
+.segmentedControl {
+  display: flex;
   border: 1px solid var(--border-primary);
-  padding: 8px 24px;
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-.buttonYellow {
+.stepper button,
+.stepper output,
+.segmentedControl button,
+.galleryControls button,
+.playerControls button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--border-primary);
+  background: var(--control-bg);
+  color: var(--text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+}
+
+.stepper button,
+.segmentedControl button,
+.galleryControls button,
+.playerControls button {
+  cursor: pointer;
+}
+
+.stepper > :last-child,
+.segmentedControl > :last-child,
+.galleryControls > :last-child,
+.playerControls > :last-child {
+  border-right: 0;
+}
+
+.stepper output {
+  min-width: 38px;
+  background: var(--bg-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tipFieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tipFieldset legend {
+  margin-bottom: 7px;
+}
+
+.segmentedControl {
+  width: 100%;
+}
+
+.segmentedControl button {
+  flex: 1;
+}
+
+.segmentedControl .segmentActive {
+  background: var(--text-primary);
+  color: var(--bg-window);
+}
+
+.calculatorResult {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border-primary);
+  background: var(--border-primary);
+}
+
+.calculatorResult div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
   background: var(--accent-yellow);
-  border: 1px solid var(--border-primary);
-  padding: 8px 24px;
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  color: #4d4d4d;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
+  color: #202020;
 }
 
-.placeholder {
-  background: var(--bg-secondary);
-  border-radius: 2px;
-  transition: background-color 0.3s ease;
+.calculatorResult span {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.calculatorResult strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .imageFrame {
-  border: 1px solid var(--border-primary);
-  overflow: hidden;
-  transition: border-color 0.3s ease;
   position: relative;
   width: 100%;
-  height: 200px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.portrait {
+  object-fit: cover;
+  filter: contrast(1.03) saturate(0.92);
+}
+
+.galleryMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.galleryMeta > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.galleryMeta strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px;
+}
+
+.galleryMeta span,
+.nowPlaying span,
+.nowPlaying small,
+.formStatus {
+  color: var(--text-muted);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+}
+
+.galleryControls {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-primary);
+}
+
+.galleryControls button {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.galleryControls > span {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 40px;
+  border-right: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.contactForm,
+.contactForm label {
+  display: flex;
+  flex-direction: column;
+}
+
+.contactForm {
+  gap: 10px;
+}
+
+.contactForm label {
+  gap: 5px;
+}
+
+.inlineFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.contactForm input,
+.contactForm textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #292929;
+  background: #fffff8;
+  color: #202020;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+}
+
+.contactForm textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primaryButton,
+.textButton {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #292929;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #202020;
+  color: #ffffff;
+}
+
+.textButton {
+  background: transparent;
+  color: #202020;
+}
+
+.formStatus {
+  min-height: 14px;
+  margin: 0;
+  color: #424242;
+}
+
+.musicPlayer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nowPlaying {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 86px;
+  padding: 12px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.nowPlaying span {
+  color: var(--accent-green);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.nowPlaying strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.playerControls {
+  display: flex;
+  align-self: center;
+  border: 1px solid var(--border-primary);
+}
+
+.playerControls .playButton {
+  min-width: 56px;
+  background: var(--accent-coral);
+  color: #ffffff;
+}
+
+.trackProgress {
+  height: 3px;
+  overflow: hidden;
+  background: var(--border-muted);
+}
+
+.trackProgress span {
+  display: block;
+  width: 36%;
+  height: 100%;
+  background: var(--text-primary);
+  transform: translateX(-110%);
+}
+
+.trackProgressActive {
+  animation: play-progress 1.8s linear infinite;
+}
+
+@keyframes play-progress {
+  to {
+    transform: translateX(310%);
+  }
+}
+
+.button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border-primary);
+  background: var(--control-bg);
+  color: var(--text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 380px) {
+  .inlineFields {
+    grid-template-columns: 1fr;
+  }
 }

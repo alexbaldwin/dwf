@@ -1,10 +1,9 @@
 [build]
-  command = "pnpm build"
+  command = "pnpm setup:browsers && pnpm verify"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "24"
-  PNPM_FLAGS = "--shamefully-hoist"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

@@ -1,52 +1,52 @@
 .desktopIcon {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
   align-items: center;
+  flex-direction: column;
+  flex: 0 0 64px;
+  gap: 5px;
+  min-width: 64px;
+  min-height: 58px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--bg-primary) 72%, transparent);
   cursor: pointer;
 }
 
-.desktopIcon:focus-visible {
-  outline: 2px solid var(--accent-yellow);
-  outline-offset: 4px;
+.desktopIcon:hover,
+.desktopIcon[aria-pressed='true'] {
+  border-color: var(--border-muted);
+  background: var(--bg-window);
 }
 
 .iconContainer {
-  width: 48px;
-  height: 16px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  width: 44px;
+  height: 18px;
 }
 
 .decorativeLines {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  width: 100%;
+  height: 100%;
   padding: 2px 4px;
 }
 
 .line {
-  height: 1px;
-  background-color: var(--border-primary);
   width: 100%;
-  transition: background-color 0.3s ease;
+  height: 1px;
+  background: var(--border-primary);
 }
 
 .label {
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 18px;
-  color: var(--text-secondary);
-  text-align: center;
   margin: 0;
-  transition: color 0.3s ease;
+  color: var(--text-secondary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
 }

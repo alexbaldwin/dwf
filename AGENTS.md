@@ -1,23 +1,26 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-The Next.js app treats `pages/` as route entry points; `pages/index.js` renders the draggable workspace and `pages/api/` holds API stubs. Reusable UI lives in `components/` (currently `tetris.jsx`), shared styling sits in `styles/`, and static media belongs in `public/` (e.g., `public/images/`). `next.config.js` presently keeps `reactStrictMode` off; revisit that flag if you harden stateful components.
+## Architecture
 
-## Build, Test, and Development Commands
-- `pnpm install` — install dependencies; pnpm is the required package manager (declared in `package.json`).
-- `pnpm dev` — start the Next dev server on port 3000 with live reloading.
-- `pnpm build` — generate the optimized production bundle; run before deployment checks.
-- `pnpm start` — serve the output of `pnpm build` locally for smoke testing.
-- `pnpm lint` — execute the ESLint flat-config suite; treat warnings as blockers.
+This is a Next.js 16 Pages Router application using React 19, JavaScript, CSS Modules, Framer Motion, and react-draggable. `pages/index.js` owns workspace state and responsive orchestration. Interactive window contents live in `components/`; pure Tetris rules live in `components/tetrisLogic.js`. Static assets belong in `public/images/`.
 
-## Coding Style & Naming Conventions
-Stick to React function components with hooks, keeping component files in PascalCase (`NewWidget.jsx`) and page files in lower-case route form (`pages/about.js`). Match the current two-space indentation, prefer single quotes, and omit semicolons unless syntax demands them. Break JSX attributes onto separate lines when props exceed one or two items. Run `pnpm lint` after edits and commit any new formatter configuration alongside code changes.
+Large screens (at least 1280px wide and 900px tall) use bounded draggable windows. Smaller or shorter screens use normal document flow. Preserve that split when changing layout behavior, and keep hidden games or media from consuming global input or background work.
 
-## Testing Guidelines
-No automated tests ship yet, so pair focused manual checks (drag handles, image loads, breakpoints) with a clean `pnpm lint`. When adding coverage, use Jest + React Testing Library, place specs in `__tests__/` near the source, and name them `component.test.jsx`. Prioritize behavior-driven assertions and note coverage expectations in each PR.
+## Commands
 
-## Commit & Pull Request Guidelines
-Commit history favors short, direct messages (e.g., “Tetris demo”, “Dithered images”); continue using present-tense, imperative phrasing that explains intent in under ~60 characters. For pull requests, provide a concise summary, testing evidence (commands run or manual steps), links to related issues, and UI screenshots/gifs when visuals change. Rebase on `main`, confirm `pnpm lint` passes, and call out any follow-up work.
+- `pnpm setup` installs dependencies and Playwright Chromium for a clean checkout.
+- `pnpm dev` starts local development on port 3000.
+- `pnpm lint` runs ESLint with zero warnings allowed.
+- `pnpm test` runs Jest and Testing Library.
+- `pnpm build` creates the production build.
+- `pnpm test:browser` tests a dedicated production server on port 3200.
+- `pnpm perf` checks desktop/mobile Web Vitals and layout budgets on port 3100.
+- `pnpm verify` runs the complete quality gate.
 
-## Assets & Configuration Tips
-Keep images in `public/images/`, compress before commit, and favor `next/image` for responsive needs; when using `img`, set width and height to avoid layout shift. Limit `ssr: false` dynamic imports to components that truly require browser APIs. Document any new environment variables in `.env.example` before use.
+## Conventions
+
+Use React function components and hooks, two-space indentation, single quotes, and no semicolons unless required. Keep page route files lowercase and reusable components PascalCase. Prefer semantic HTML and controls with at least 44px touch targets. Respect reduced motion, avoid `transition: all`, provide visible focus states, and do not fake network-backed success states.
+
+Keep component tests beside source in `components/__tests__/` and browser flows in `tests/`. Add focused coverage for reducer branches, keyboard behavior, persistence, responsive bounds, and user-visible workflows. Every change must leave `pnpm verify` green.
+
+Document new environment variables in `.env.example`. Prefer `next/image` with stable dimensions for responsive media. Keep deployment commands aligned with the full verification gate.

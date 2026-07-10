@@ -1,149 +1,194 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import dynamic from 'next/dynamic'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styles from '../styles/Home.module.css'
-import contentStyles from '../styles/WindowContent.module.css'
+import AnimatedWindow from '../components/AnimatedWindow'
 import Window from '../components/Window'
 import DesktopIcon from '../components/DesktopIcon'
+import ContactDraft from '../components/ContactDraft'
+import DinnerCalculator from '../components/DinnerCalculator'
+import MusicPlayer from '../components/MusicPlayer'
+import PortraitGallery from '../components/PortraitGallery'
+import Tetris from '../components/tetris'
 
-const Tetris = dynamic(() => import('../components/tetris'), { ssr: false })
-
-const AnimatedWindow = dynamic(() => import('../components/AnimatedWindow'), {
-  ssr: false
-})
+const WINDOW_NAMES = ['calculator', 'images', 'contact', 'tetris', 'music']
 
 function getInitialWindowPositions(viewportWidth = 1440) {
-  if (viewportWidth < 760) {
-    return {
-      calculator: { x: 16, y: 58 },
-      images: { x: 16, y: 178 },
-      email: { x: 16, y: 430 },
-      tetris: { x: 16, y: 720 },
-      music: { x: 16, y: 1110 }
-    }
-  }
-
-  if (viewportWidth < 1180) {
-    return {
-      calculator: { x: 24, y: 58 },
-      images: { x: 48, y: 470 },
-      email: { x: viewportWidth - 330, y: 76 },
-      tetris: { x: viewportWidth - 410, y: 320 },
-      music: { x: viewportWidth - 310, y: 710 }
-    }
-  }
-
   return {
-    calculator: { x: 24, y: 54 },
-    images: { x: 70, y: 550 },
-    email: { x: 950, y: 77 },
-    tetris: { x: 1160, y: 212 },
-    music: { x: 1152, y: 739 }
+    calculator: { x: 24, y: 82 },
+    images: { x: 58, y: 540 },
+    contact: { x: Math.max(952, viewportWidth - 328), y: 62 },
+    tetris: { x: Math.max(1002, viewportWidth - 278), y: 414 },
+    music: { x: Math.round(viewportWidth / 2) - 145, y: 662 }
   }
 }
 
+function getPreferredTheme() {
+  const saved = window.localStorage.getItem('dwf-theme')
+  if (saved === 'light' || saved === 'dark') return saved
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
 export default function Home() {
-  const [date, setDate] = useState(() => new Date())
+  const [date, setDate] = useState(null)
   const [theme, setTheme] = useState('light')
-  const [windowStates, setWindowStates] = useState({
-    calculator: 'visible',
-    images: 'visible',
-    email: 'visible',
-    tetris: 'visible',
-    music: 'visible'
-  })
-  const [windowPositions, setWindowPositions] = useState(() =>
-    getInitialWindowPositions(typeof window === 'undefined' ? undefined : window.innerWidth)
+  const [themeReady, setThemeReady] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+  const [windowStates, setWindowStates] = useState(() =>
+    Object.fromEntries(WINDOW_NAMES.map((name) => [name, 'visible']))
   )
+  const [windowPositions, setWindowPositions] = useState(() => getInitialWindowPositions())
+  const [stack, setStack] = useState(WINDOW_NAMES)
+
+  const calculatorRef = useRef(null)
+  const contactRef = useRef(null)
+  const imagesRef = useRef(null)
+  const tetrisRef = useRef(null)
+  const musicRef = useRef(null)
+
+  const windowRefs = useMemo(() => ({
+    calculator: calculatorRef,
+    images: imagesRef,
+    contact: contactRef,
+    tetris: tetrisRef,
+    music: musicRef
+  }), [])
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setDate(new Date())
-    }, 1000)
-    return () => clearInterval(timer)
+    const initialTick = window.setTimeout(() => setDate(new Date()), 0)
+    const timer = window.setInterval(() => setDate(new Date()), 1000)
+    return () => {
+      window.clearTimeout(initialTick)
+      window.clearInterval(timer)
+    }
+  }, [])
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setTheme(getPreferredTheme())
+      setThemeReady(true)
+    }, 0)
+    return () => window.clearTimeout(timeout)
   }, [])
 
   useEffect(() => {
     document.body.setAttribute('data-theme', theme)
-    return () => document.body.removeAttribute('data-theme')
-  }, [theme])
+    if (themeReady) window.localStorage.setItem('dwf-theme', theme)
+  }, [theme, themeReady])
 
-  const toggleTheme = (selectedTheme) => {
-    setTheme(selectedTheme)
-  }
-
-  const minimizeWindow = (windowName) => {
-    setWindowStates(prev => ({
-      ...prev,
-      [windowName]: 'minimized'
-    }))
-  }
-
-  const restoreWindow = (windowName) => {
-    setWindowStates(prev => ({
-      ...prev,
-      [windowName]: 'visible'
-    }))
-  }
-
-  const handleIconClick = (windowName) => {
-    if (windowStates[windowName] === 'minimized') {
-      restoreWindow(windowName)
-    } else {
-      minimizeWindow(windowName)
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1280px) and (min-height: 900px)')
+    const updateMode = () => {
+      setIsDesktop(media.matches)
+      if (media.matches) setWindowPositions(getInitialWindowPositions(window.innerWidth))
     }
-  }
+    updateMode()
+    media.addEventListener('change', updateMode)
+    return () => media.removeEventListener('change', updateMode)
+  }, [])
 
-  const updateWindowPosition = (windowName, position) => {
-    setWindowPositions(prev => ({
-      ...prev,
-      [windowName]: position
-    }))
-  }
+  const bringToFront = useCallback((windowName) => {
+    setStack((current) => [...current.filter((name) => name !== windowName), windowName])
+  }, [])
 
-  const calculatorRef = useRef(null)
-  const emailRef = useRef(null)
-  const imagesRef = useRef(null)
-  const tetrisRef = useRef(null)
-  const musicRef = useRef(null)
+  const minimizeWindow = useCallback((windowName) => {
+    setWindowStates((current) => ({ ...current, [windowName]: 'minimized' }))
+  }, [])
+
+  const focusWindow = useCallback((windowName) => {
+    setWindowStates((current) => ({ ...current, [windowName]: 'visible' }))
+    bringToFront(windowName)
+
+    if (!isDesktop) {
+      window.setTimeout(() => {
+        document.querySelector(`[data-window="${windowName}"]`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }, 30)
+    }
+  }, [bringToFront, isDesktop])
+
+  const resetWorkspace = useCallback(() => {
+    setWindowStates(Object.fromEntries(WINDOW_NAMES.map((name) => [name, 'visible'])))
+    setStack(WINDOW_NAMES)
+    setWindowPositions(getInitialWindowPositions(window.innerWidth))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  const updateWindowPosition = useCallback((windowName, position) => {
+    setWindowPositions((current) => ({ ...current, [windowName]: position }))
+  }, [])
+
+  const renderWindow = ({ name, title, width, backgroundColor, children }) => (
+    <AnimatedWindow
+      key={name}
+      isVisible={windowStates[name] === 'visible'}
+      isDraggable={isDesktop}
+      nodeRef={windowRefs[name]}
+      position={windowPositions[name]}
+      onPositionChange={(position) => updateWindowPosition(name, position)}
+      onActivate={() => bringToFront(name)}
+      zIndex={100 + stack.indexOf(name)}
+      className={`${styles.desktopWindow} ${styles[`${name}Shell`]}`}
+    >
+      <Window
+        name={name}
+        title={title}
+        width={width}
+        backgroundColor={backgroundColor}
+        onMinimize={() => minimizeWindow(name)}
+      >
+        {children}
+      </Window>
+    </AnimatedWindow>
+  )
+
+  const formattedDate = date?.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  })
+  const formattedTime = date?.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 
   return (
     <div className={styles.container}>
       <Head>
         <title>Dinner with Friends</title>
-        <meta name="description" content="Dinner with Friends - Interactive Desktop" />
+        <meta
+          name="description"
+          content="Dinner with Friends is an interactive creative desktop for sharing ideas, portraits, music, and play."
+        />
+        <meta name="theme-color" content={theme === 'dark' ? '#171717' : '#f2f1ed'} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <nav className={styles.nav}>
-        <div className={styles.navLeft}>
-          <div className={styles.navBrand}>Dinner with Friends</div>
-          <div className={styles.navItem}>Work</div>
-          <div className={`${styles.navItem} ${styles.inactive}`}>About</div>
-          <div className={`${styles.navItem} ${styles.inactive}`}>Knowledge</div>
-          <div className={`${styles.navItem} ${styles.inactive}`}>Contact</div>
+      <nav className={styles.nav} aria-label="Workspace navigation">
+        <button type="button" className={styles.navBrand} onClick={resetWorkspace}>
+          Dinner with Friends
+        </button>
+        <div className={styles.navLinks}>
+          <button type="button" onClick={resetWorkspace}>Desk</button>
+          <button type="button" onClick={() => focusWindow('images')}>People</button>
+          <button type="button" onClick={() => focusWindow('tetris')}>Play</button>
+          <button type="button" onClick={() => focusWindow('contact')}>Contact</button>
         </div>
-        <div className={styles.navRight}>
-          <div className={styles.navTime}>
-            {date.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-          <div className={styles.navTime}>
-            {date.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' })}
-          </div>
-          <div className={styles.navTheme}>
+        <div className={styles.navMeta}>
+          <span className={styles.navTime}>{formattedDate || 'Today'}</span>
+          <span className={styles.navTime}>{formattedTime || '--:-- --'}</span>
+          <div className={styles.themeControl} aria-label="Color theme">
             <button
               type="button"
-              className={theme === 'dark' ? styles.inactive : ''}
-              onClick={() => toggleTheme('light')}
+              onClick={() => setTheme('light')}
               aria-pressed={theme === 'light'}
             >
               Light
             </button>
             <button
               type="button"
-              className={theme === 'light' ? styles.inactive : ''}
-              onClick={() => toggleTheme('dark')}
+              onClick={() => setTheme('dark')}
               aria-pressed={theme === 'dark'}
             >
               Dark
@@ -153,137 +198,68 @@ export default function Home() {
       </nav>
 
       <main className={styles.main}>
-        <div className={styles.hero}>
-          <p>Hello, we are</p>
-          <p>Dinner with Friends.</p>
+        <section className={styles.hero} aria-labelledby="hero-title" data-region="hero">
+          <p className={styles.eyebrow}>A small creative studio</p>
+          <h1 id="hero-title">Dinner<br />with Friends.</h1>
+          <p className={styles.heroCopy}>Ideas are better when the table is full.</p>
+        </section>
+
+        <div className={styles.desktopIcons} aria-label="Workspace windows" data-region="window-dock">
+          {[
+            ['calculator', 'Calculator'],
+            ['images', 'Images'],
+            ['contact', 'Contact'],
+            ['tetris', 'Tetris'],
+            ['music', 'Music']
+          ].map(([name, label]) => (
+            <DesktopIcon
+              key={name}
+              name={label}
+              isYellow={name === 'contact'}
+              isActive={windowStates[name] === 'visible'}
+              onClick={() => focusWindow(name)}
+            />
+          ))}
         </div>
 
-        <div className={styles.footer}>
-          <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
+        <div className={styles.windowLayer}>
+          {renderWindow({
+            name: 'calculator',
+            title: 'Split the Bill',
+            width: '260px',
+            children: <DinnerCalculator />
+          })}
+          {renderWindow({
+            name: 'images',
+            title: 'At the Table',
+            width: '302px',
+            children: <PortraitGallery />
+          })}
+          {renderWindow({
+            name: 'contact',
+            title: 'Leave a Note',
+            width: '320px',
+            backgroundColor: 'var(--accent-yellow)',
+            children: <ContactDraft />
+          })}
+          {renderWindow({
+            name: 'tetris',
+            title: 'After Dinner',
+            width: '360px',
+            children: <Tetris isActive={windowStates.tetris === 'visible'} />
+          })}
+          {renderWindow({
+            name: 'music',
+            title: 'Dinner Radio',
+            width: '290px',
+            children: <MusicPlayer isActive={windowStates.music === 'visible'} />
+          })}
         </div>
 
-        <div className={styles.desktopIcons}>
-          <DesktopIcon name="Calculator" onClick={() => handleIconClick('calculator')} />
-          <DesktopIcon name="Images" onClick={() => handleIconClick('images')} />
-          <DesktopIcon name="Email" isYellow onClick={() => handleIconClick('email')} />
-          <DesktopIcon name="Tetris" onClick={() => handleIconClick('tetris')} />
-          <DesktopIcon name="Music" onClick={() => handleIconClick('music')} />
-        </div>
-
-        <AnimatedWindow
-          isVisible={windowStates.calculator === 'visible'}
-          nodeRef={calculatorRef}
-          position={windowPositions.calculator}
-          onPositionChange={(pos) => updateWindowPosition('calculator', pos)}
-        >
-          <div className={styles.calculatorShell}>
-            <Window
-              title="Calculator"
-              width="min(200px, calc(100vw - 32px))"
-              onMinimize={() => minimizeWindow('calculator')}
-            >
-              <div className={contentStyles.display}>
-                $$$
-              </div>
-            </Window>
-          </div>
-        </AnimatedWindow>
-
-        <AnimatedWindow
-          isVisible={windowStates.images === 'visible'}
-          nodeRef={imagesRef}
-          position={windowPositions.images}
-          onPositionChange={(pos) => updateWindowPosition('images', pos)}
-        >
-          <div className={styles.imagesShell}>
-            <Window
-              title="Images"
-              width="min(281px, calc(100vw - 32px))"
-              onMinimize={() => minimizeWindow('images')}
-            >
-              <div className={contentStyles.imageFrame}>
-                <Image
-                  src="/images/alex.jpg"
-                  alt="Portrait of Alex Baldwin"
-                  fill
-                  loading="eager"
-                  sizes="(max-width: 760px) calc(100vw - 56px), 257px"
-                  style={{ objectFit: 'cover', opacity: 0.6 }}
-                />
-              </div>
-            </Window>
-          </div>
-        </AnimatedWindow>
-
-        <AnimatedWindow
-          isVisible={windowStates.email === 'visible'}
-          nodeRef={emailRef}
-          position={windowPositions.email}
-          onPositionChange={(pos) => updateWindowPosition('email', pos)}
-        >
-          <div className={styles.emailShell}>
-            <Window
-              title="Email"
-              backgroundColor="var(--accent-yellow)"
-              width="min(250px, calc(100vw - 32px))"
-              onMinimize={() => minimizeWindow('email')}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <input
-                  type="text"
-                  placeholder="Name"
-                  aria-label="Name"
-                  className={contentStyles.input}
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  aria-label="Email"
-                  className={contentStyles.input}
-                />
-                <textarea
-                  placeholder="Message"
-                  aria-label="Message"
-                  rows="7"
-                  className={contentStyles.textarea}
-                />
-              </div>
-              <button type="button" className={contentStyles.buttonYellow}>
-                Send
-              </button>
-            </Window>
-          </div>
-        </AnimatedWindow>
-
-        <AnimatedWindow
-          isVisible={windowStates.tetris === 'visible'}
-          nodeRef={tetrisRef}
-          position={windowPositions.tetris}
-          onPositionChange={(pos) => updateWindowPosition('tetris', pos)}
-        >
-          <div className={styles.tetrisShell}>
-            <Window
-              title="Tetris"
-              onMinimize={() => minimizeWindow('tetris')}
-              width="min(360px, calc(100vw - 32px))"
-            >
-              <Tetris />
-            </Window>
-          </div>
-        </AnimatedWindow>
-
-        <AnimatedWindow
-          isVisible={windowStates.music === 'visible'}
-          nodeRef={musicRef}
-          position={windowPositions.music}
-          onPositionChange={(pos) => updateWindowPosition('music', pos)}
-        >
-          <div className={styles.musicShell}>
-            <Window title="Music" onMinimize={() => minimizeWindow('music')}>
-              <div className={contentStyles.placeholder} style={{ height: '44px', width: '200px' }} />
-            </Window>
-          </div>
-        </AnimatedWindow>
+        <footer className={styles.footer} data-region="footer">
+          <span>Detroit and wherever dinner takes us.</span>
+          <span>DWF / {new Date().getFullYear()}</span>
+        </footer>
       </main>
     </div>
   )

@@ -27,13 +27,12 @@ function useInterval(callback, delay) {
   }, [delay])
 }
 
-function isTextEntryTarget(target) {
+function isInteractiveTarget(target) {
   if (!target || target.nodeType !== 1) return false
-  const tagName = target.tagName?.toLowerCase()
-  return target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select'
+  return Boolean(target.closest('button, a[href], input, textarea, select, [contenteditable="true"]'))
 }
 
-export default function Tetris() {
+export default function Tetris({ isActive = true }) {
   const hasStartedRef = useRef(false)
   const [state, dispatch] = useReducer(gameReducer, undefined, createIdleState)
   const {
@@ -41,7 +40,9 @@ export default function Tetris() {
     activePiece,
     isRunning,
     isGameOver,
-    level
+    level,
+    lines,
+    score
   } = state
 
   const startNewGame = useCallback(() => {
@@ -78,7 +79,7 @@ export default function Tetris() {
     startNewGame()
   }, [startNewGame])
 
-  const dropDelay = isRunning && !isGameOver ? getSpeed(level) : null
+  const dropDelay = isActive && isRunning && !isGameOver ? getSpeed(level) : null
   useInterval(softDrop, dropDelay)
 
   const ghostPiece = useMemo(
@@ -106,8 +107,9 @@ export default function Tetris() {
   }, [activePiece, board, ghostPiece])
 
   useEffect(() => {
+    if (!isActive) return undefined
     const handleKeyDown = (event) => {
-      if (event.defaultPrevented || isTextEntryTarget(event.target)) return
+      if (event.defaultPrevented || isInteractiveTarget(event.target)) return
       switch (event.key) {
         case 'ArrowLeft':
           event.preventDefault()
@@ -146,10 +148,15 @@ export default function Tetris() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hardDrop, moveHorizontal, rotatePiece, softDrop, startNewGame, togglePause])
+  }, [hardDrop, isActive, moveHorizontal, rotatePiece, softDrop, startNewGame, togglePause])
 
   return (
     <div className={styles.container}>
+      <div className={styles.stats} aria-label="Game status">
+        <div><span>Score</span><strong>{score}</strong></div>
+        <div><span>Lines</span><strong>{lines}</strong></div>
+        <div><span>Level</span><strong>{level}</strong></div>
+      </div>
       <div className={styles.frame}>
         <div className={styles.board} role="grid" aria-label="Tetris board">
           {displayBoard.map((row, rowIndex) =>
@@ -174,6 +181,17 @@ export default function Tetris() {
             })
           )}
         </div>
+      </div>
+      <p className={styles.status} aria-live="polite">
+        {isGameOver ? 'Game over' : isRunning ? 'Playing' : 'Paused'}
+      </p>
+      <div className={styles.touchControls} aria-label="Tetris controls">
+        <button type="button" onClick={() => moveHorizontal(-1)} aria-label="Move left">&lt;</button>
+        <button type="button" onClick={rotatePiece} aria-label="Rotate piece">Rotate</button>
+        <button type="button" onClick={() => moveHorizontal(1)} aria-label="Move right">&gt;</button>
+        <button type="button" onClick={softDrop} aria-label="Move down">Down</button>
+        <button type="button" onClick={hardDrop} aria-label="Hard drop">Drop</button>
+        <button type="button" onClick={togglePause}>{isRunning ? 'Pause' : 'Resume'}</button>
       </div>
       <div className={styles.actions}>
         <button

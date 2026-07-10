@@ -1,42 +1,110 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border-primary);
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-right: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.stats div:last-child {
+  border-right: 0;
+}
+
+.stats span,
+.status {
+  color: var(--text-muted);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.stats strong {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
 }
 
 .frame {
   position: relative;
   width: 100%;
-  height: 320px;
+  height: 300px;
+  overflow: hidden;
   border: 1px solid var(--border-primary);
   background: var(--bg-secondary);
-  overflow: hidden;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .board {
   position: absolute;
-  inset: 12px;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
   display: grid;
+  width: auto;
+  aspect-ratio: 1 / 2;
+  transform: translateX(-50%);
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(20, 1fr);
   gap: 1px;
-  background: var(--bg-secondary);
-  padding: 4px;
+  padding: 3px;
+  background: var(--border-muted);
 }
 
 .cell {
-  border: 1px solid var(--border-primary);
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid color-mix(in srgb, var(--border-primary) 45%, transparent);
   background: var(--bg-window);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .cellGhost {
   border-style: dashed;
-  border-color: var(--border-primary);
   background: transparent !important;
-  opacity: 0.5;
+  opacity: 0.65;
+}
+
+.status {
+  min-height: 12px;
+  margin: 0;
+  text-align: center;
+}
+
+.touchControls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.touchControls button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 1px solid var(--border-primary);
+  background: var(--control-bg);
+  color: var(--text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.touchControls button:nth-child(5) {
+  background: var(--accent-yellow);
+  color: #202020;
 }
 
 .actions {
@@ -46,6 +114,19 @@
 
 .actionButton {
   width: 100%;
-  font-size: 20px;
-  padding: 8px 24px;
+}
+
+@media (min-width: 1280px) and (min-height: 900px) and (pointer: fine) {
+  .frame {
+    height: 260px;
+  }
+
+  .touchControls {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .touchControls button {
+    min-height: 36px;
+    font-size: 10px;
+  }
 }
