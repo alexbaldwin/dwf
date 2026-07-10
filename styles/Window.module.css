@@ -1,49 +1,86 @@
 .window {
-  border: 1px solid var(--border-primary);
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-window);
+  box-shadow: var(--shadow-window);
 }
 
 .titleBar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 9px;
+  min-height: 36px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.titleBar:active {
+  cursor: grabbing;
 }
 
 .titleBarLines {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 0;
-  justify-content: space-between;
-  min-height: 24px;
+  justify-content: space-around;
+  min-width: 20px;
+  height: 22px;
 }
 
 .line {
-  height: 1px;
-  background-color: var(--border-primary);
   width: 100%;
-  transition: background-color 0.3s ease;
+  height: 1px;
+  background: var(--border-primary);
 }
 
 .title {
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 24px;
-  color: var(--text-secondary);
   margin: 0;
+  color: var(--text-secondary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
   white-space: nowrap;
-  line-height: normal;
-  transition: color 0.3s ease;
+}
+
+.minimizeButton {
+  position: relative;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-window);
+  cursor: pointer;
+}
+
+.minimizeButton:hover {
+  background: var(--bg-secondary);
+}
+
+.minimizeButton span {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  left: 9px;
+  height: 2px;
+  background: currentColor;
 }
 
 .content {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+@media (max-width: 1279px), (max-height: 899px) {
+  .titleBar {
+    cursor: default;
+    touch-action: auto;
+  }
 }

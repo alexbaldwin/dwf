@@ -1,146 +1,341 @@
 .container {
+  min-height: 100svh;
+  width: 100%;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) auto minmax(320px, 1fr);
+  align-items: center;
+  min-height: 52px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border-primary);
+  background: color-mix(in srgb, var(--bg-primary) 94%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.nav button {
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.navBrand {
+  justify-self: start;
   padding: 0;
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.navLinks,
+.navMeta,
+.themeControl {
+  display: flex;
+  align-items: center;
+}
+
+.navLinks {
+  gap: 4px;
+}
+
+.navLinks button,
+.themeControl button,
+.navTime {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.navLinks button {
+  padding: 0 10px;
+}
+
+.navLinks button:hover {
+  background: var(--bg-secondary);
+}
+
+.navMeta {
+  justify-self: end;
+  gap: 16px;
+}
+
+.navTime {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.themeControl {
+  border: 1px solid var(--border-primary);
+}
+
+.themeControl button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--text-muted);
+}
+
+.themeControl button[aria-pressed='true'] {
+  background: var(--text-primary);
+  color: var(--bg-primary);
 }
 
 .main {
-  height: 100vh;
-  width: 100vw;
+  position: relative;
+  min-height: calc(100svh - 52px);
+  overflow: hidden;
   background-color: var(--bg-primary);
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 48px 48px;
-  position: relative;
-  overflow: hidden;
-  padding-top: 36px;
-  box-sizing: border-box;
-  transition: background-color 0.3s ease;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  border-left: 0;
-  border-right: 0;
-  border-top: 0;
-  position: fixed;
-  right: 0;
-  left: 0;
-  top: 0;
-  padding: 8px 16px;
-  box-sizing: border-box;
-  z-index: 1000;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.navLeft {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  color: var(--text-secondary);
-}
-
-.navBrand {
-  font-family: 'PP Editorial New', serif;
-  font-weight: bold;
-  font-size: 13px;
-  letter-spacing: -0.325px;
-}
-
-.navItem {
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.navItem.inactive {
-  opacity: 0.4;
-}
-
-.navRight {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.navTime {
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  color: var(--text-secondary);
-  white-space: pre;
-}
-
-.navTheme {
-  display: flex;
-  gap: 8px;
-  font-family: 'PP NeueBit', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  color: var(--text-secondary);
-}
-
-.navTheme span {
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.navTheme span.inactive {
-  opacity: 0.4;
+  background-size: 40px 40px;
 }
 
 .hero {
   position: absolute;
+  top: 31%;
   left: 50%;
-  top: 432px;
+  width: min(620px, 50vw);
   transform: translateX(-50%);
-  width: 1324px;
-  font-family: 'PP Editorial New', serif;
-  font-weight: normal;
-  font-size: 128px;
-  line-height: 132px;
-  letter-spacing: -4.48px;
-  color: var(--text-primary);
   text-align: center;
   pointer-events: none;
-  transition: color 0.3s ease;
 }
 
-.hero p {
+.eyebrow,
+.heroCopy {
   margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.footer {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  width: 1146px;
-  max-width: 90vw;
-  font-family: 'PP NeueBit', sans-serif;
-  font-size: 20px;
-  letter-spacing: 0.2px;
-  color: var(--text-primary);
-  text-align: center;
-  line-height: 18px;
-  z-index: 50;
-  transition: color 0.3s ease;
+.eyebrow {
+  margin-bottom: 14px;
+  color: var(--accent-green);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 88px;
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.heroCopy {
+  margin-top: 20px;
+  color: var(--text-muted);
+  text-transform: none;
 }
 
 .desktopIcons {
-  position: fixed;
-  right: 80px;
-  top: 70px;
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  z-index: 80;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 10;
+  flex-direction: row;
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.windowLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.desktopWindow {
+  position: absolute;
+  max-width: calc(100vw - 32px);
+}
+
+@media (min-width: 1280px) and (min-height: 900px) {
+  .tetrisShell [data-window='tetris'] {
+    width: 270px !important;
+  }
+}
+
+.footer {
+  position: absolute;
+  right: 20px;
+  bottom: 12px;
+  left: 20px;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  color: var(--text-muted);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+@media (max-width: 1279px), (max-height: 899px) {
+  .nav {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .navTime:first-child {
+    display: none;
+  }
+
+  .main {
+    min-height: calc(100svh - 52px);
+    overflow: visible;
+  }
+
+  .hero {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(680px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 72px 0 58px;
+    transform: none;
+  }
+
+  .hero h1 {
+    font-size: 72px;
+  }
+
+  .desktopIcons {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 18px;
+    width: 100%;
+    padding: 14px 20px 30px;
+    transform: none;
+  }
+
+  .windowLayer {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 24px;
+    width: min(900px, 100%);
+    margin: 0 auto;
+    padding: 0 24px 56px;
+  }
+
+  .desktopWindow {
+    position: static !important;
+    justify-self: center;
+    max-width: 100%;
+    transform: none !important;
+  }
+
+  .tetrisShell {
+    grid-row: span 2;
+  }
+
+  .footer {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    padding: 18px 20px;
+    border-top: 1px solid var(--border-primary);
+  }
+}
+
+@media (max-width: 760px) {
+  .nav {
+    grid-template-areas:
+      'brand theme'
+      'links links';
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 8px 12px;
+  }
+
+  .navBrand {
+    grid-area: brand;
+  }
+
+  .navLinks {
+    grid-area: links;
+    justify-content: space-between;
+  }
+
+  .navLinks button {
+    min-width: 60px;
+    min-height: 40px;
+    padding: 0 6px;
+  }
+
+  .navMeta {
+    grid-area: theme;
+  }
+
+  .navTime {
+    display: none;
+  }
+
+  .themeControl button {
+    min-width: 52px;
+    min-height: 38px;
+    padding: 0 6px;
+  }
+
+  .hero {
+    padding: 54px 0 38px;
+  }
+
+  .hero h1 {
+    font-size: 52px;
+  }
+
+  .eyebrow,
+  .heroCopy {
+    font-size: 12px;
+  }
+
+  .desktopIcons {
+    justify-content: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 12px 26px;
+  }
+
+  .windowLayer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    width: 100%;
+    padding: 0 12px 44px;
+  }
+
+  .desktopWindow {
+    width: 100%;
+  }
+
+  .desktopWindow > div,
+  .desktopWindow > div > div,
+  .desktopWindow [data-window] {
+    max-width: 100%;
+  }
+
+  .tetrisShell {
+    grid-row: auto;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
 }

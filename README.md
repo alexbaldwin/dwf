@@ -1,39 +1,49 @@
-## Dinner with Friends — Desktop Playground
+# Dinner with Friends
 
-This repo powers the interactive “Dinner with Friends” desktop experience built on Next.js.
+An interactive creative desktop built with Next.js Pages Router and React. The wide layout behaves like a draggable desktop; tablet and mobile layouts become an ordered, touch-friendly document flow.
 
-### Prerequisites
+## Setup
 
-- Node 20+
-- [pnpm](https://pnpm.io/) 8.x (project declares `packageManager: pnpm@8.15.5`)
-
-Install once:
+Use Node 24 LTS (or a supported Node 22 release) and the pnpm version declared by `packageManager` in `package.json`.
 
 ```bash
-pnpm install
-```
-
-### Local Development
-
-```bash
+corepack enable
+pnpm setup
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to explore the draggable windows (Calculator, Images, Email, Tetris, Music). Each window remembers its position and can be minimized/restored via the desktop icons.
+Open [http://localhost:3000](http://localhost:3000). `pnpm setup` installs packages and the Chromium binary required by the browser and performance checks.
 
-Key code entry points:
+## Features
 
-- `pages/index.js` — desktop layout, window state, dynamic imports
-- `components/AnimatedWindow.jsx` — draggable shell with framer-motion transitions
-- `components/tetris.jsx` — custom React Tetris implementation
-- `styles/*` — global theme tokens plus window-specific styling
+- Draggable, focusable, minimizable desktop windows on wide screens
+- Responsive tablet and mobile layouts without overlapping content
+- Persistent light and dark themes
+- Bill splitting calculator with guest and tip controls
+- Local portrait gallery and browser-persisted contact draft
+- User-initiated Web Audio dinner radio
+- Playable Tetris with keyboard, pointer, and touch controls
 
-### Verification Workflow
+## Verification
 
 ```bash
-pnpm lint   # ESLint flat config
-pnpm build  # Production bundle check
-pnpm start  # Optional: serve the build locally
+pnpm lint          # ESLint, with zero warnings allowed
+pnpm test          # Jest and Testing Library
+pnpm build         # Optimized Next.js production build
+pnpm test:browser  # Playwright against a dedicated production server
+pnpm perf          # Desktop/mobile Web Vitals and layout budgets
+pnpm verify        # Complete local quality gate
 ```
 
-Deploy with your preferred platform (e.g., Vercel) by running the same `pnpm build` step in CI before publishing.
+The performance gate checks production FCP, LCP, CLS, load time, critical image loading, horizontal overflow, window bounds, and surface overlap. Screenshots are written to `.perf/` for inspection.
+
+## Structure
+
+- `pages/index.js`: workspace state, navigation, responsive window orchestration
+- `components/`: window primitives and complete interactive features
+- `components/tetrisLogic.js`: pure Tetris reducer and game rules
+- `styles/`: global theme tokens and scoped CSS Modules
+- `tests/`: production browser behavior and layout checks
+- `scripts/performance-check.mjs`: production performance budget
+
+Optional performance harness overrides are documented in `.env.example`.

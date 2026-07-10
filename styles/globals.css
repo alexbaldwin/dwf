@@ -1,11 +1,59 @@
-/* TODO: Add @font-face declarations for PP NeueBit and PP Editorial New fonts */
+:root {
+  --bg-primary: #f2f1ed;
+  --bg-secondary: #e3e7e2;
+  --bg-window: #faf9f5;
+  --control-bg: #ffffff;
+  --text-primary: #242424;
+  --text-secondary: #343434;
+  --text-muted: #696969;
+  --border-primary: #2c2c2c;
+  --border-muted: #a8aaa5;
+  --accent-yellow: #edff45;
+  --accent-coral: #db635a;
+  --accent-green: #487e58;
+  --grid-line: #d9d8d3;
+  --focus-ring: #111111;
+  --shadow-window: 5px 5px 0 rgb(36 36 36 / 12%);
+  color-scheme: light;
+}
+
+body[data-theme='dark'] {
+  --bg-primary: #181a18;
+  --bg-secondary: #252a26;
+  --bg-window: #202320;
+  --control-bg: #2b302c;
+  --text-primary: #f0efe9;
+  --text-secondary: #f0efe9;
+  --text-muted: #b6bbb5;
+  --border-primary: #d9dbd7;
+  --border-muted: #656a65;
+  --accent-yellow: #dced3f;
+  --accent-coral: #f17b70;
+  --accent-green: #75a982;
+  --grid-line: #2b2f2b;
+  --focus-ring: #ffffff;
+  --shadow-window: 5px 5px 0 rgb(0 0 0 / 34%);
+  color-scheme: dark;
+}
 
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  min-height: 100%;
+}
+
+html {
+  background: var(--bg-primary);
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  width: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 a {
@@ -13,98 +61,56 @@ a {
   text-decoration: none;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-:root {
-  /* Light Theme (Default) */
-  --bg-primary: #ebebeb;
-  --bg-secondary: #e1e1e1;
-  --bg-window: #ebebeb;
-  --text-primary: #4d4d4d;
-  --text-secondary: #4d4d4d;
-  --border-primary: #4d4d4d;
-  --accent-yellow: #ecff0f;
-  --grid-line: #d0d0d0;
+button,
+input,
+textarea,
+select {
+  border-radius: 0;
+  font: inherit;
 }
 
-body[data-theme="dark"] {
-  /* Dark Theme */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --bg-window: #1a1a1a;
-  --text-primary: #9e9e9e;
-  --text-secondary: #ebebeb;
-  --border-primary: #4d4d4d;
-  --accent-yellow: #ecff0f;
-  --grid-line: #2a2a2a;
+button {
+  color: inherit;
 }
 
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
-input, textarea, button {
-  font-family: inherit;
+::selection {
+  background: var(--accent-yellow);
+  color: #202020;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-primary);
-  opacity: 0.7;
+@media (max-width: 1279px), (max-height: 899px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-// Tetris
-.AlignCenter {
-  margin:0px auto; 
-  padding:0;
-  border: 10px solid;
-  border-color: #888888;
-  text-align:center;
-  display: none;
-}
-.ButtonAlignCenter {
-  margin:0px auto; 
-  padding:0;
-  border: 1px solid;
-  border-color: #444444;
-  text-align:center;
-  background-color:black;
-}
-.PlayField {
-    position: relative;
-    display: inline-block;
-    width: 20%; height: 100%;
-}
-.WhiteText {
-  color: white;
-  background-color:black;
-  display: none;
-}
-.FancyBorder {
-  padding: 10px 10px;
-  /* border: 1px solid;
-  border-color: #aaaaaa; */
-}
-.tdcol-0{
-    background: #E1E1E1;
-    mix-blend-mode: multiply;
-}
-
-.tdcol-1,
-.tdcol-2,
-.tdcol-3,
-.tdcol-4,
-.tdcol-5,
-.tdcol-6,
-.tdcol-7 {
-    background-color: var(--brand-primary); 
-    opacity: 0.5;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
